@@ -1,6 +1,6 @@
 package com.project.noris.auth.repository;
 
-import com.project.noris.auth.entity.Users;
+import com.project.noris.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

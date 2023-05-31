@@ -1,7 +1,7 @@
 package com.project.noris.auth.service;
 
 
-import com.project.noris.auth.entity.Users;
+import com.project.noris.entity.Users;
 import com.project.noris.auth.repository.UsersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;

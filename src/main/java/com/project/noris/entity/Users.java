@@ -1,4 +1,4 @@
-package com.project.noris.auth.entity;
+package com.project.noris.entity;
 
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,17 +17,30 @@ import java.util.stream.Collectors;
 @Setter
 @Getter
 @Entity
+@Table(name = "user")
 public class Users extends BaseTime implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idx;
+    private Long id;
 
     @Column
     private String email;
 
     @Column
     private String password;
+
+    @Column
+    private String name;
+
+    @ManyToOne
+    @JoinColumn(name="department_id")
+    private Department department_id;
+
+    @Column
+    private String image;
+
+
 
     @Column
     @ElementCollection(fetch = FetchType.EAGER)
