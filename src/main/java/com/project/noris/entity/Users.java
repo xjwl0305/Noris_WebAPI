@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Setter
 @Getter
-@Entity
+@Entity(name = "user")
 @Table(name = "user")
 public class Users extends BaseTime implements UserDetails {
 

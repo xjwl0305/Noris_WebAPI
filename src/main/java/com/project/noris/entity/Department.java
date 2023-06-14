@@ -9,14 +9,14 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Setter
 @Getter
-@Entity
+@Entity(name = "department")
 @Table(name = "department")
 public class Department extends BaseTime{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(unique = true)
     private String name;
 
     @ManyToOne

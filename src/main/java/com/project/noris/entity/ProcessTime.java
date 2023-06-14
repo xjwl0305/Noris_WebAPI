@@ -10,7 +10,7 @@ import java.sql.Date;
 @AllArgsConstructor
 @Setter
 @Getter
-@Entity
+@Entity(name = "process_time")
 @Table(name = "process_time")
 public class ProcessTime extends BaseTime {
     @Id
