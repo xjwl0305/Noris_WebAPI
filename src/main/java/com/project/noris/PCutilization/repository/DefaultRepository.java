@@ -36,8 +36,10 @@ public interface DefaultRepository extends JpaRepository<Organization, Long>{
     @Query(value = "select * from organization where name in (select department.name from department left join user u on department.id = u.department_id where u.id = :uid)", nativeQuery = true)
     Organization getDepartments(@Param("uid")int uid);
 
+
     @Query(value = "select organization.id, organization.name from organization where parent_id = :id or department_id = :id limit 3", nativeQuery = true)
     List<TeaminfoDto> getTeamData(@Param("id") Long id);
+
 
     // 팀 인원 로그데이터 조회
     @Query(value ="select u.name as user_name, log_data.log_time, log_data.process_name, log_data.process_title, log_data.status, log_data.action, log_data.user_id " +

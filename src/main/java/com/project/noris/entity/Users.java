@@ -33,6 +33,18 @@ public class Users extends BaseTime implements UserDetails {
     @Column
     private String name;
 
+    @Column
+    private String connect;
+
+    @Column
+    private String join_date;
+
+    @Column
+    private String position;
+
+    @Column
+    private String status;
+
     @ManyToOne
     @JoinColumn(name="department_id")
     private Department department_id;
