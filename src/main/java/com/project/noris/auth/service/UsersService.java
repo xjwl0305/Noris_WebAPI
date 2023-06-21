@@ -1,6 +1,7 @@
 package com.project.noris.auth.service;
 
 import com.project.noris.auth.dto.Response;
+import com.project.noris.auth.dto.UserInfoDto;
 import com.project.noris.auth.dto.request.UserRequestDto;
 import com.project.noris.auth.dto.response.UserResponseDto;
 import com.project.noris.entity.Users;
@@ -10,6 +11,7 @@ import com.project.noris.auth.repository.UsersRepository;
 import com.project.noris.security.SecurityUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.json.simple.JSONObject;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -72,7 +74,11 @@ public class UsersService {
         redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
-        return response.success(tokenInfo, "로그인에 성공했습니다.", HttpStatus.OK);
+        JSONObject final_result = new JSONObject();
+        UserInfoDto userInfoDto = usersRepository.getuserinfo(login.getEmail());
+        final_result.put("userInfo", userInfoDto);
+        final_result.put("authentication", tokenInfo);
+        return response.success(final_result, "로그인에 성공했습니다.", HttpStatus.OK);
     }
 
     public ResponseEntity<?> reissue(UserRequestDto.Reissue reissue) {
