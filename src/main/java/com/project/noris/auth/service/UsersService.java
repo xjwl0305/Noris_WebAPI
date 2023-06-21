@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -75,7 +76,7 @@ public class UsersService {
                 .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
         JSONObject final_result = new JSONObject();
-        UserInfoDto userInfoDto = usersRepository.getuserinfo(login.getEmail());
+        Optional<UserInfoDto> userInfoDto = usersRepository.getuserinfo(login.getEmail());
         final_result.put("userInfo", userInfoDto);
         final_result.put("authentication", tokenInfo);
         return response.success(final_result, "로그인에 성공했습니다.", HttpStatus.OK);

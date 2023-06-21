@@ -14,5 +14,5 @@ public interface UsersRepository extends JpaRepository<Users, Long> {
 
     @Query(value = "select u.id as uid, d.name as department_name, c.name as company_name from noris_solution.user u " +
             "left join department d on u.department_id = d.id left join company c on d.company_id = c.id where email = :email", nativeQuery = true)
-    UserInfoDto getuserinfo(@Param("email") String email);
+    Optional<UserInfoDto> getuserinfo(@Param("email") String email);
 }
