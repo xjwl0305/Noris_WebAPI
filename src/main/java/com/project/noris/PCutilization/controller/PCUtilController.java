@@ -24,6 +24,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/pc_util")
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PCUtilController {
 
     private final DefaultService defaultService;
