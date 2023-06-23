@@ -84,7 +84,7 @@ public class UsersService {
                 .sameSite("None")
                 .httpOnly(true)
                 .build();
-        Response.setHeader("Set-Cookie", cookie.toString());
+        Response.setHeader("tokenCookie", cookie.toString());
 
         JSONObject final_result = new JSONObject();
         Optional<UserInfoDto> userInfoDto = usersRepository.getuserinfo(login.getEmail());
