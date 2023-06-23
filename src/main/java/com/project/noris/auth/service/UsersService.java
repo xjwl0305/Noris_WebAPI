@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONObject;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -26,6 +27,7 @@ import org.springframework.util.ObjectUtils;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,7 +56,7 @@ public class UsersService {
         return response.success("회원가입에 성공했습니다.");
     }
 
-    public ResponseEntity<?> login(UserRequestDto.Login login) {
+    public ResponseEntity<?> login(UserRequestDto.Login login, HttpServletResponse Response) {
 
         if (usersRepository.findByEmail(login.getEmail()).orElse(null) == null) {
             return response.fail("해당하는 유저가 존재하지 않습니다.", HttpStatus.BAD_REQUEST);
@@ -75,10 +77,20 @@ public class UsersService {
         redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", tokenInfo.getRefreshToken())
+                .maxAge(7 * 24 * 60 * 60)
+                .path("/")
+                .secure(true)
+                .sameSite("None")
+                .httpOnly(true)
+                .build();
+        Response.setHeader("Set-Cookie", cookie.toString());
+
         JSONObject final_result = new JSONObject();
         Optional<UserInfoDto> userInfoDto = usersRepository.getuserinfo(login.getEmail());
         final_result.put("userInfo", userInfoDto);
-        final_result.put("authentication", tokenInfo);
+        final_result.put("accessToken", tokenInfo.getAccessToken());
+
         return response.success(final_result, "로그인에 성공했습니다.", HttpStatus.OK);
     }
 
@@ -102,13 +114,13 @@ public class UsersService {
         }
 
         // 4. 새로운 토큰 생성
-        UserResponseDto.TokenInfo tokenInfo = jwtTokenProvider.generateToken(authentication);
+        UserResponseDto.TokenInfo tokenInfo = jwtTokenProvider.generateAccessToken(authentication);
 
         // 5. RefreshToken Redis 업데이트
-        redisTemplate.opsForValue()
-                .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
+//        redisTemplate.opsForValue()
+//                .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
-        return response.success(tokenInfo, "Token 정보가 갱신되었습니다.", HttpStatus.OK);
+        return response.success(tokenInfo, "Access Token 정보가 갱신되었습니다.", HttpStatus.OK);
     }
 
     public ResponseEntity<?> logout(UserRequestDto.Logout logout) {

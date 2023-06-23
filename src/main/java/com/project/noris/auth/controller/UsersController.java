@@ -13,6 +13,8 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/account")
@@ -34,12 +36,13 @@ public class UsersController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody @Validated UserRequestDto.Login login, Errors errors) {
+    public ResponseEntity<?> login(@RequestBody @Validated UserRequestDto.Login login, HttpServletResponse Response, Errors errors) {
         // validation check
         if (errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));
         }
-        return usersService.login(login);
+
+        return usersService.login(login, Response);
     }
 
     @PostMapping("/reissue")
