@@ -77,19 +77,19 @@ public class UsersService {
         redisTemplate.opsForValue()
                 .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", tokenInfo.getRefreshToken())
-                .maxAge(7 * 24 * 60 * 60)
-                .path("/")
-                .secure(true)
-                .sameSite("None")
-                .httpOnly(true)
-                .build();
-        Response.setHeader("tokenCookie", cookie.toString());
+//        ResponseCookie cookie = ResponseCookie.from("refreshToken", tokenInfo.getRefreshToken())
+//                .maxAge(7 * 24 * 60 * 60)
+//                .path("/")
+//                .secure(true)
+//                .sameSite("None")
+//                .httpOnly(true)
+//                .build();
+//        Response.setHeader("tokenCookie", cookie.toString());
 
         JSONObject final_result = new JSONObject();
         Optional<UserInfoDto> userInfoDto = usersRepository.getuserinfo(login.getEmail());
         final_result.put("userInfo", userInfoDto);
-        final_result.put("accessToken", tokenInfo.getAccessToken());
+        final_result.put("authentication", tokenInfo);
 
         return response.success(final_result, "로그인에 성공했습니다.", HttpStatus.OK);
     }

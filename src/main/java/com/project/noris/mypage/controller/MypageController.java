@@ -44,8 +44,10 @@ public class MypageController {
         Users user = mypageService.getUserInfo(req);
 
         return ResponseEntity.ok(user);
+
         //return response.success(defaultService.getOrganization(req.getCompany()));
     }
+
 
     @PostMapping("/update")
     public ResponseEntity<?> MyPageUpdate(@RequestPart("userInfoDto") @Valid userInfoDto userinfo, BindingResult bindingResult

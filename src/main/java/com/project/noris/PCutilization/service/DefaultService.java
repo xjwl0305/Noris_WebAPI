@@ -43,8 +43,8 @@ public class DefaultService {
         String format = "yyyy-MM-dd";
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         cal.add(Calendar.DATE, -1);
-//        String date = sdf.format(cal.getTime());
-        String date = "2023-06-07";
+        String date = sdf.format(cal.getTime());
+//        String date = "2023-06-07";
         for (TeaminfoDto datum : data) {
             List<TeamLogDataDto> log_data = defaultRepository.getTeamLogData(datum.getName(), date);
             TeamdataDto a = getTeamData(log_data, datum.getName());

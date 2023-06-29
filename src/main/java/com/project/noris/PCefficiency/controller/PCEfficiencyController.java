@@ -57,5 +57,4 @@ public class PCEfficiencyController {
         return ResponseEntity.ok(final_result);
         //return response.success(defaultService.getOrganization(req.getCompany()));
     }
-
 }
