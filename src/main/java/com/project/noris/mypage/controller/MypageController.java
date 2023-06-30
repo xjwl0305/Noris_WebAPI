@@ -36,12 +36,12 @@ public class MypageController {
 
     private final MypageService mypageService;
     @GetMapping("/user")
-    public ResponseEntity<?> MyPage(HttpServletRequest req, Errors errors) {
+    public ResponseEntity<?> MyPage(HttpServletRequest req) {
         // validation check
 
-        if (errors.hasErrors()) {
-            return response.invalidFields(Helper.refineErrors(errors));
-        }
+//        if (errors.hasErrors()) {
+//            return response.invalidFields(Helper.refineErrors(errors));
+//        }
         Users user = mypageService.getUserInfo(Integer.parseInt(req.getParameter("uid")));
 
         return ResponseEntity.ok(user);
