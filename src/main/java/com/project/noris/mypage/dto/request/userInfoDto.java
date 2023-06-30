@@ -13,6 +13,8 @@ import javax.persistence.*;
 @JsonAutoDetect
 public class userInfoDto {
 
+    private int uid;
+
     private String connect;
 
     private String image;
