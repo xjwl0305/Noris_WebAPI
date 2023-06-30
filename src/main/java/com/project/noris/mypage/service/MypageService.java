@@ -31,15 +31,13 @@ public class MypageService {
         File profileImg=  new File("src/main/resources/static/profile_img",fileName);
         imgFile.transferTo(profileImg);
         userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
-        int update_status = mypageRepository.UpdateUser(userInfo.getId(), userInfo.getName(), userInfo.getEmail(), userInfo.getConnect(),
-                userInfo.getJoin_date(), userInfo.getPosition(), userInfo.getStatus(), userInfo.getImage());
+        int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), userInfo.getImage());
         if(update_status == 0){
             throw new Exception("Error! userInfo updating failed..");
         }
     }
     public void UpdateUserInfoWithoutImage(userInfoDto userInfo) throws Exception {
-        int update_status = mypageRepository.UpdateUser(userInfo.getId(), userInfo.getName(), userInfo.getEmail(), userInfo.getConnect(),
-                userInfo.getJoin_date(), userInfo.getPosition(), userInfo.getStatus(), userInfo.getImage());
+        int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), "");
         if(update_status == 0){
             throw new Exception("Error! userInfo updating failed..");
         }

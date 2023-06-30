@@ -13,20 +13,7 @@ import javax.persistence.*;
 @JsonAutoDetect
 public class userInfoDto {
 
-    private Long id;
-
-    private String email;
-
-    private String name;
-
     private String connect;
 
-    private String join_date;
-
-    private String position;
-
-    private String status;
-
     private String image;
-
 }

@@ -19,8 +19,7 @@ public interface MypageRepository extends JpaRepository<Users, Long> {
 
     @Transactional
     @Modifying
-    @Query(value = "update user set name = :name, email = :email, connect = :connect, join_date = :join_date, position = :position, status = :status, image = :image where user.id = :uid", nativeQuery = true)
-    int UpdateUser(@Param("uid") long uid, @Param("name") String name, @Param("email") String email, @Param("connect") String connect,@Param("join_date") String join_date,@Param("position") String position,
-                  @Param("status") String status, @Param("image") String image);
+    @Query(value = "update user set connect = :connect, image = :image where user.id = :uid", nativeQuery = true)
+    int UpdateUser(@Param("connect") String connect, @Param("image") String image);
 
 }
