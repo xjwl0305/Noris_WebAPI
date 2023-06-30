@@ -21,9 +21,9 @@ public class MypageService {
 
     private final MypageRepository mypageRepository;
 
-    public Users getUserInfo(mypageRequestDto req){
+    public Users getUserInfo(int uid){
 
-        return mypageRepository.getUser(req.getUid());
+        return mypageRepository.getUser(uid);
     }
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile) throws Exception {
         UUID uuid = UUID.randomUUID();

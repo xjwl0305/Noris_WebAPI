@@ -21,6 +21,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -35,13 +36,13 @@ public class MypageController {
 
     private final MypageService mypageService;
     @GetMapping("/user")
-    public ResponseEntity<?> MyPage(@RequestBody @Validated mypageRequestDto req, Errors errors) {
+    public ResponseEntity<?> MyPage(HttpServletRequest req, Errors errors) {
         // validation check
 
         if (errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));
         }
-        Users user = mypageService.getUserInfo(req);
+        Users user = mypageService.getUserInfo(Integer.parseInt(req.getParameter("uid")));
 
         return ResponseEntity.ok(user);
 
