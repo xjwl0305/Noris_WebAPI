@@ -50,6 +50,16 @@ public class UserRequestDto {
 
     @Getter
     @Setter
+    public static class UserInfo {
+
+        private int uid;
+
+        @NotEmpty(message = "email을 입력해주세요.")
+        private String email;
+    }
+
+    @Getter
+    @Setter
     public static class Logout {
         @NotEmpty(message = "잘못된 요청입니다.")
         private String accessToken;

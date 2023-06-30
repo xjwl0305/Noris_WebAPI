@@ -1,9 +1,11 @@
 package com.project.noris.auth.service;
 
+import com.project.noris.PCutilization.dto.OrganizationDto;
 import com.project.noris.auth.dto.Response;
 import com.project.noris.auth.dto.UserInfoDto;
 import com.project.noris.auth.dto.request.UserRequestDto;
 import com.project.noris.auth.dto.response.UserResponseDto;
+import com.project.noris.entity.Organization;
 import com.project.noris.entity.Users;
 import com.project.noris.auth.enums.Authority;
 import com.project.noris.auth.jwt.JwtTokenProvider;
@@ -23,10 +25,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import com.project.noris.PCutilization.repository.DefaultRepository;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
@@ -35,6 +40,8 @@ import javax.servlet.http.HttpServletResponse;
 public class UsersService {
 
     private final UsersRepository usersRepository;
+
+    private final DefaultRepository defaultRepository;
     private final Response response;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -121,6 +128,19 @@ public class UsersService {
 //                .set("RT:" + authentication.getName(), tokenInfo.getRefreshToken(), tokenInfo.getRefreshTokenExpirationTime(), TimeUnit.MILLISECONDS);
 
         return response.success(tokenInfo, "Access Token 정보가 갱신되었습니다.", HttpStatus.OK);
+    }
+
+    public ResponseEntity<?> userInfo(UserRequestDto.UserInfo userInfo){
+        Optional<UserInfoDto> userInfoDto = usersRepository.getuserinfo(userInfo.getEmail());
+        int company_id = usersRepository.getCompanyID(userInfo.getEmail());
+
+        final List<Organization> all = defaultRepository.findAllByParentIsNull(company_id);
+        List<OrganizationDto> collect = all.stream().map(OrganizationDto::new).collect(Collectors.toList());
+        JSONObject final_result = new JSONObject();
+
+        final_result.put("organization", collect);
+        final_result.put("userInfo", userInfoDto);
+        return response.success(final_result, "유저세부 정보입니다.", HttpStatus.OK);
     }
 
     public ResponseEntity<?> logout(UserRequestDto.Logout logout) {

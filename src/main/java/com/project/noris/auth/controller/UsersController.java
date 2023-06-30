@@ -69,10 +69,14 @@ public class UsersController {
         return usersService.authority();
     }
 
-    @GetMapping("/userTest")
-    public ResponseEntity<?> userTest() {
-        log.info("ROLE_USER TEST");
-        return response.success();
+    @GetMapping("/userinfo")
+    public ResponseEntity<?> userInfo(@RequestBody @Validated UserRequestDto.UserInfo userInfo, Errors errors) {
+        // validation check
+        if (errors.hasErrors()) {
+            return response.invalidFields(Helper.refineErrors(errors));
+        }
+
+        return usersService.userInfo(userInfo);
     }
 
     @GetMapping("/adminTest")
