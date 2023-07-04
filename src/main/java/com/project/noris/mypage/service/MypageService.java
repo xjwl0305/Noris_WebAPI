@@ -47,8 +47,8 @@ public class MypageService {
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
-        String path = new File("src\\main\\resources\\static\\profile_img").getCanonicalPath();
-        File profileImg=  new File(path+"\\",fileName);
+        String path = new File("src/main/resources/static/profile_img").getCanonicalPath();
+        File profileImg=  new File(path,fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
         int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), profileImg.getAbsolutePath(), Integer.parseInt(userInfo.getUid()));
