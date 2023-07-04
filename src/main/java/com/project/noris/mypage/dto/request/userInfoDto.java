@@ -5,6 +5,7 @@ import com.project.noris.entity.Department;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.repository.query.Param;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 
@@ -13,9 +14,9 @@ import javax.persistence.*;
 @JsonAutoDetect
 public class userInfoDto {
 
-    private int uid;
+    private String uid;
 
     private String connect;
 
-    private String image;
+    private String img_path;
 }

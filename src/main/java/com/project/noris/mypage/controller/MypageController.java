@@ -23,6 +23,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -36,34 +38,38 @@ public class MypageController {
 
     private final MypageService mypageService;
     @GetMapping("/user")
-    public ResponseEntity<?> MyPage(HttpServletRequest req) {
+    public ResponseEntity<?> MyPage(HttpServletRequest req) throws IOException {
         // validation check
 
 //        if (errors.hasErrors()) {
 //            return response.invalidFields(Helper.refineErrors(errors));
 //        }
-        Users user = mypageService.getUserInfo(Integer.parseInt(req.getParameter("uid")));
+        JSONObject final_result = mypageService.getUserInfo(Integer.parseInt(req.getParameter("uid")));
 
-        return ResponseEntity.ok(user);
+        return ResponseEntity.ok(final_result);
 
         //return response.success(defaultService.getOrganization(req.getCompany()));
     }
 
 
     @PostMapping("/update")
-    public ResponseEntity<?> MyPageUpdate(@RequestPart("userInfoDto") @Valid userInfoDto userinfo, BindingResult bindingResult
-            , @RequestPart(value = "imgFile",required = false) MultipartFile imgFile, Errors errors) throws Exception {
+    public ResponseEntity<?> MyPageUpdate(@RequestPart("uid") String uid, @RequestPart("connect") String connect
+            , @RequestPart(value = "imgFile",required = false) MultipartFile imgFile, @RequestPart(value = "imgPath", required = false) String imgPath,
+                                          Errors errors) throws Exception {
         // validation check
-        if (bindingResult.hasErrors()) {
-            return  response.invalidFields(Helper.refineErrors(bindingResult));
-        }
+//        if (bindingResult.hasErrors()) {
+//            return  response.invalidFields(Helper.refineErrors(bindingResult));
+//        }
         if (errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));
         }
+        userInfoDto userinfo = new userInfoDto();
+        userinfo.setConnect(connect);
+        userinfo.setUid(uid);
         if(imgFile==null){
-            mypageService.UpdateUserInfoWithoutImage(userinfo);
+            mypageService.UpdateUserInfoWithoutImage(userinfo, imgPath);
         }else {
-            mypageService.UpdateUserInfo(userinfo, imgFile);
+            mypageService.UpdateUserInfo(userinfo, imgFile, imgPath);
         }
         return new ResponseEntity<>("success", HttpStatus.OK);
     }

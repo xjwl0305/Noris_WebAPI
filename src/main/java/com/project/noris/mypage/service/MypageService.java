@@ -6,12 +6,18 @@ import com.project.noris.mypage.dto.request.userInfoDto;
 import com.project.noris.mypage.repository.MypageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
+import org.json.simple.JSONObject;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import sun.tools.jconsole.JConsole;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 @Slf4j
@@ -21,23 +27,50 @@ public class MypageService {
 
     private final MypageRepository mypageRepository;
 
-    public Users getUserInfo(int uid){
+    public JSONObject getUserInfo(int uid) throws IOException {
+        Users user = mypageRepository.getUser(uid);
+        JSONObject final_result = new JSONObject();
+        if (Objects.equals(user.getImage(), "")) {
+            final_result.put("image", "");
+        }else {
+            InputStream imageStream = Files.newInputStream(Paths.get(user.getImage()));
 
-        return mypageRepository.getUser(uid);
+//		InputStream imageStream = new FileInputStream("/home/ubuntu/images/feed/" + imagename);
+            byte[] imageByteArray = IOUtils.toByteArray(imageStream);
+            imageStream.close();
+            final_result.put("image", imageByteArray);
+        }
+        final_result.put("user_info", user);
+
+        return final_result;
     }
-    public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile) throws Exception {
+    public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
-        File profileImg=  new File("src/main/resources/static/profile_img",fileName);
+        String path = new File("src\\main\\resources\\static\\profile_img").getCanonicalPath();
+        File profileImg=  new File(path+"\\",fileName);
         imgFile.transferTo(profileImg);
-        userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
-        int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), userInfo.getImage(), userInfo.getUid());
+        //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
+        int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), profileImg.getAbsolutePath(), Integer.parseInt(userInfo.getUid()));
         if(update_status == 0){
             throw new Exception("Error! userInfo updating failed..");
+        }else {
+            File file = new File(imgPath);
+            if (file.exists()) {
+                if (file.delete()) {
+                    System.out.println(imgPath + " -- file is deleted!!");
+                }
+            }
         }
     }
-    public void UpdateUserInfoWithoutImage(userInfoDto userInfo) throws Exception {
-        int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), "", userInfo.getUid());
+    public void UpdateUserInfoWithoutImage(userInfoDto userInfo, String imgPath) throws Exception {
+        int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), "", Integer.parseInt(userInfo.getUid()));
+        File file = new File(imgPath);
+        if(file.exists()){
+            if(file.delete()){
+                System.out.println(imgPath + " -- file is deleted!!");
+            };
+        }
         if(update_status == 0){
             throw new Exception("Error! userInfo updating failed..");
         }
