@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
@@ -130,9 +131,9 @@ public class UsersService {
         return response.success(tokenInfo, "Access Token 정보가 갱신되었습니다.", HttpStatus.OK);
     }
 
-    public ResponseEntity<?> userInfo(UserRequestDto.UserInfo userInfo){
-        Optional<UserInfoDto> userInfoDto = usersRepository.getuserinfo(userInfo.getEmail());
-        int company_id = usersRepository.getCompanyID(userInfo.getEmail());
+    public ResponseEntity<?> userInfo(HttpServletRequest req){
+        Optional<UserInfoDto> userInfoDto = usersRepository.getuserinfo(req.getParameter("email"));
+        int company_id = usersRepository.getCompanyID(req.getParameter("email"));
 
         final List<Organization> all = defaultRepository.findAllByParentIsNull(company_id);
         List<OrganizationDto> collect = all.stream().map(OrganizationDto::new).collect(Collectors.toList());

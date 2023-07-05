@@ -13,6 +13,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @Slf4j
@@ -70,13 +71,13 @@ public class UsersController {
     }
 
     @GetMapping("/userinfo")
-    public ResponseEntity<?> userInfo(@RequestBody @Validated UserRequestDto.UserInfo userInfo, Errors errors) {
+    public ResponseEntity<?> userInfo(HttpServletRequest req, Errors errors) {
         // validation check
         if (errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));
         }
 
-        return usersService.userInfo(userInfo);
+        return usersService.userInfo(req);
     }
 
     @GetMapping("/adminTest")

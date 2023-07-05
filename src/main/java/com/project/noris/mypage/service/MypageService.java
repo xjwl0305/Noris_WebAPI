@@ -28,7 +28,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class MypageService extends HttpServlet {
+public class MypageService {
 
     private final MypageRepository mypageRepository;
 
@@ -52,8 +52,9 @@ public class MypageService extends HttpServlet {
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
-
-        String path = new ClassPathResource("/static/profile_img").getFile().getAbsolutePath();
+        //String uploadPath = getServletContext().getRealPath("/").concat("resources");
+        //String imgUploadPath = uploadPath + File.separator + "profile_img";  // 이미지를 업로드할 폴더를 설정 = /uploadPath/imgUpload
+        String path = new ClassPathResource("/profile_img").getPath();
         File profileImg=  new File(path,fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
