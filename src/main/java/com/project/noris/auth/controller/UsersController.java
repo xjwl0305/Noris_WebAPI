@@ -71,13 +71,13 @@ public class UsersController {
     }
 
     @GetMapping("/userinfo")
-    public ResponseEntity<?> userInfo(HttpServletRequest req, Errors errors) {
+    public ResponseEntity<?> userInfo(HttpServletRequest request) {
         // validation check
-        if (errors.hasErrors()) {
-            return response.invalidFields(Helper.refineErrors(errors));
-        }
+//        if (errors.hasErrors()) {
+//            return response.invalidFields(Helper.refineErrors(errors));
+//        }
 
-        return usersService.userInfo(req);
+        return usersService.userInfo(request);
     }
 
     @GetMapping("/adminTest")
