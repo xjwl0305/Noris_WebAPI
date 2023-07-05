@@ -13,6 +13,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sun.tools.jconsole.JConsole;
 
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -23,7 +26,7 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class MypageService {
+public class MypageService extends HttpServlet {
 
     private final MypageRepository mypageRepository;
 
@@ -47,8 +50,9 @@ public class MypageService {
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
+        String resourceSrc = getServletContext().getRealPath("/static/profile_img");
         String path = new File("noris/src/main/resources/static/profile_img").getCanonicalPath();
-        File profileImg=  new File(path,fileName);
+        File profileImg=  new File(resourceSrc,fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
         int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), profileImg.getAbsolutePath(), Integer.parseInt(userInfo.getUid()));
