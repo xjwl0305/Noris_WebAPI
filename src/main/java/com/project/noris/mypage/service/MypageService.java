@@ -47,7 +47,7 @@ public class MypageService {
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
-        String path = new File("src/main/resources/static/profile_img").getCanonicalPath();
+        String path = new File("noris/src/main/resources/static/profile_img").getCanonicalPath();
         File profileImg=  new File(path,fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
