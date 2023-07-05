@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -50,8 +51,12 @@ public class MypageService extends HttpServlet {
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
-        String resourceSrc = getServletContext().getRealPath("/static/profile_img");
+        String resourceSrc = getServletContext().getRealPath("/profile_img");
+        System.out.println(resourceSrc);
+        String r = this.getClass().getResource("").getPath();
+        System.out.println(r);
         String path = new File("noris/src/main/resources/static/profile_img").getCanonicalPath();
+        System.out.println(path);
         File profileImg=  new File(resourceSrc,fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
