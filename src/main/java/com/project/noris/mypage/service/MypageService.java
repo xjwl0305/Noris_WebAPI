@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONObject;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -51,13 +52,9 @@ public class MypageService extends HttpServlet {
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
-        String resourceSrc = getServletContext().getRealPath("/profile_img");
-        System.out.println(resourceSrc);
-        String r = this.getClass().getResource("").getPath();
-        System.out.println(r);
-        String path = new File("noris/src/main/resources/static/profile_img").getCanonicalPath();
-        System.out.println(path);
-        File profileImg=  new File(resourceSrc,fileName);
+
+        String path = new ClassPathResource("/static/profile_img").getFile().getAbsolutePath();
+        File profileImg=  new File(path,fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
         int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), profileImg.getAbsolutePath(), Integer.parseInt(userInfo.getUid()));
