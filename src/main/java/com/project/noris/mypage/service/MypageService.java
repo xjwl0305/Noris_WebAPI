@@ -28,8 +28,10 @@ import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class MypageService {
-
+public class MypageService{
+    private final String rootPath = System.getProperty("user.dir");
+    // 프로젝트 루트 경로에 있는 files 디렉토리
+    private final String fileDir = rootPath + "/src/main/resources/static/profile_img";
     private final MypageRepository mypageRepository;
 
     public JSONObject getUserInfo(int uid) throws IOException {
@@ -52,10 +54,8 @@ public class MypageService {
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
-        //String uploadPath = getServletContext().getRealPath("/").concat("resources");
-        //String imgUploadPath = uploadPath + File.separator + "profile_img";  // 이미지를 업로드할 폴더를 설정 = /uploadPath/imgUpload
-        String path = new ClassPathResource("/profile_img").getPath();
-        File profileImg=  new File("src/main/resources/static/profile_img",fileName);
+
+        File profileImg=  new File(fileDir,fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
         int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), profileImg.getAbsolutePath(), Integer.parseInt(userInfo.getUid()));
