@@ -8,12 +8,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import sun.tools.jconsole.JConsole;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,9 +32,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class MypageService{
-    private final String rootPath = System.getProperty("user.dir");
-    // 프로젝트 루트 경로에 있는 files 디렉토리
-    private final String fileDir = rootPath + "/src/main/resources/static/profile_img";
+
+
     private final MypageRepository mypageRepository;
 
     public JSONObject getUserInfo(int uid) throws IOException {
@@ -54,8 +56,8 @@ public class MypageService{
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
-
-        File profileImg=  new File(fileDir,fileName);
+        String absolutePath = new FileSystemResource("").getFile().getAbsolutePath();
+        File profileImg=  new File(absolutePath+"/src/main/resources/static/profile_img",fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
         int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), profileImg.getAbsolutePath(), Integer.parseInt(userInfo.getUid()));
