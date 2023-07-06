@@ -55,7 +55,7 @@ public class MypageService {
         //String uploadPath = getServletContext().getRealPath("/").concat("resources");
         //String imgUploadPath = uploadPath + File.separator + "profile_img";  // 이미지를 업로드할 폴더를 설정 = /uploadPath/imgUpload
         String path = new ClassPathResource("/profile_img").getPath();
-        File profileImg=  new File(path,fileName);
+        File profileImg=  new File("src/main/resources/static/profile_img",fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
         int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), profileImg.getAbsolutePath(), Integer.parseInt(userInfo.getUid()));
