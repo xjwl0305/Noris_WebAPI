@@ -57,12 +57,12 @@ public class MypageService{
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
-        ClassPathResource resource = new ClassPathResource("profile_img/20bc66de-1bab-4a4c-911c-f1975632db1a_img.jpg");
-        String name = resource.getURI().getPath();
-        String file_name = FilenameUtils.getName(name);
-        String change = name.replace(file_name, "");
-        System.out.println(file_name);
-        File profileImg=  new File(change,fileName);
+//        ClassPathResource resource = new ClassPathResource("profile_img/20bc66de-1bab-4a4c-911c-f1975632db1a_img.jpg");
+//        String name = resource.getURI().getPath();
+//        String file_name = FilenameUtils.getName(name);
+//        String change = name.replace(file_name, "");
+//        System.out.println(file_name);
+        File profileImg=  new File(fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
         int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), profileImg.getAbsolutePath(), Integer.parseInt(userInfo.getUid()));
