@@ -1,6 +1,7 @@
 package com.project.noris.mypage.service;
 
 import com.project.noris.entity.Users;
+import com.project.noris.lib.Service.S3Uploader;
 import com.project.noris.mypage.dto.request.mypageRequestDto;
 import com.project.noris.mypage.dto.request.userInfoDto;
 import com.project.noris.mypage.repository.MypageRepository;
@@ -34,7 +35,7 @@ import java.util.UUID;
 @Service
 public class MypageService{
 
-
+    private final S3Uploader s3Uploader;
     private final MypageRepository mypageRepository;
 
     public JSONObject getUserInfo(int uid) throws IOException {
@@ -57,11 +58,7 @@ public class MypageService{
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
-//        ClassPathResource resource = new ClassPathResource("profile_img/20bc66de-1bab-4a4c-911c-f1975632db1a_img.jpg");
-//        String name = resource.getURI().getPath();
-//        String file_name = FilenameUtils.getName(name);
-//        String change = name.replace(file_name, "");
-//        System.out.println(file_name);
+        //s3Uploader.upload(imgFile, fileName);
         File profileImg=  new File(fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);

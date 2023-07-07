@@ -40,7 +40,8 @@ dependencies {
 	implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1.1'
 	// martipart
 	implementation('commons-io:commons-io:2.11.0')
-
+	// s3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }
 
 tasks.named('test') {
