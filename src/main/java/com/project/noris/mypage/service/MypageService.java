@@ -28,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -58,7 +59,9 @@ public class MypageService{
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
         UUID uuid = UUID.randomUUID();
         String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
-        //s3Uploader.upload(imgFile, fileName);
+        File uploadFile = convert(imgFile)
+                .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패"));
+        s3Uploader.upload(uploadFile, fileName);
         File profileImg=  new File(fileName);
         imgFile.transferTo(profileImg);
         //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
@@ -73,6 +76,17 @@ public class MypageService{
                 }
             }
         }
+    }
+
+    private Optional<File> convert(MultipartFile file) throws  IOException {
+        File convertFile = new File(file.getOriginalFilename());
+        if(convertFile.createNewFile()) {
+            try (FileOutputStream fos = new FileOutputStream(convertFile)) {
+                fos.write(file.getBytes());
+            }
+            return Optional.of(convertFile);
+        }
+        return Optional.empty();
     }
     public void UpdateUserInfoWithoutImage(userInfoDto userInfo, String imgPath) throws Exception {
         int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), "", Integer.parseInt(userInfo.getUid()));

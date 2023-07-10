@@ -26,9 +26,9 @@ public class JwtTokenProvider {
 
     private static final String AUTHORITIES_KEY = "auth";
     private static final String BEARER_TYPE = "Bearer";
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 1 * 60 * 1000L;              // 30분
-    private static final long REFRESH_TOKEN_EXPIRE_TIME = 2 * 60 * 1000L;    // 7일
-// 7 * 24 * 60 * 60 * 1000L
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 45 * 60 * 1000L;              // 30분
+    private static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 1000L;    // 7일
+//  60 * 60 * 1000L
     private final Key key;
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
