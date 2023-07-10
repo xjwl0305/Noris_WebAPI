@@ -1,5 +1,6 @@
 package com.project.noris.lib.Service;
 
+import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -11,6 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -47,6 +50,13 @@ public class S3Uploader {
             return;
         }
         System.out.println("File delete fail");
+    }
+    public void fileDelete(String fileName) {
+        try {
+            amazonS3Client.deleteObject(bucket, "/profile/3f0f08d4-3dc4-4825-90d8-6992c1bc091e%EC%A4%98_%EB%AA%A8%EC%BD%94%EC%BD%94.jpg");
+        } catch (AmazonServiceException e) {
+            System.err.println(e.getErrorMessage());
+        }
     }
 
     // 로컬에 파일 업로드 하기

@@ -57,15 +57,16 @@ public class MypageService{
         return final_result;
     }
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
-        UUID uuid = UUID.randomUUID();
-        String fileName = uuid.toString() + "_" + imgFile.getOriginalFilename();
+        Users user = mypageRepository.getUser(Integer.parseInt(userInfo.getUid()));
+        if (!Objects.equals(user.getImage(), "")){
+            s3Uploader.fileDelete(user.getImage());
+        }
+        String filepath = "profile";
         File uploadFile = convert(imgFile)
-                .orElseThrow(() -> new IllegalArgumentException("MultipartFile -> File 전환 실패"));
-        s3Uploader.upload(uploadFile, fileName);
-        File profileImg=  new File(fileName);
-        imgFile.transferTo(profileImg);
-        //userInfo.setImage("src/main/resources/static/profile_img/"+fileName);
-        int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), profileImg.getAbsolutePath(), Integer.parseInt(userInfo.getUid()));
+                .orElseThrow(() -> new IllegalArgumentException());
+        String uploadURL = s3Uploader.upload(uploadFile, filepath);
+
+        int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), uploadURL, Integer.parseInt(userInfo.getUid()));
         if(update_status == 0){
             throw new Exception("Error! userInfo updating failed..");
         }else {
@@ -89,6 +90,10 @@ public class MypageService{
         return Optional.empty();
     }
     public void UpdateUserInfoWithoutImage(userInfoDto userInfo, String imgPath) throws Exception {
+//        Users user = mypageRepository.getUser(Integer.parseInt(userInfo.getUid()));
+//        if (!Objects.equals(user.getImage(), "")){
+//            s3Uploader.fileDelete(user.getImage());
+//        }
         int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), "", Integer.parseInt(userInfo.getUid()));
         File file = new File(imgPath);
         if(file.exists()){
