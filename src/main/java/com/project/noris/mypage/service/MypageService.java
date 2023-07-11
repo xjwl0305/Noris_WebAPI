@@ -57,10 +57,10 @@ public class MypageService{
         return final_result;
     }
     public void UpdateUserInfo(userInfoDto userInfo, MultipartFile imgFile, String imgPath) throws Exception {
-        Users user = mypageRepository.getUser(Integer.parseInt(userInfo.getUid()));
-        if (!Objects.equals(user.getImage(), "")){
-            s3Uploader.fileDelete(user.getImage());
-        }
+//        Users user = mypageRepository.getUser(Integer.parseInt(userInfo.getUid()));
+//        if (!Objects.equals(user.getImage(), "")){
+//            s3Uploader.fileDelete(user.getImage());
+//        }
         String filepath = "profile";
         File uploadFile = convert(imgFile)
                 .orElseThrow(() -> new IllegalArgumentException());

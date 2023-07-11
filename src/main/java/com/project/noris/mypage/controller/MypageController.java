@@ -9,6 +9,7 @@ import com.project.noris.entity.Users;
 import com.project.noris.lib.Helper;
 import com.project.noris.mypage.dto.request.mypageRequestDto;
 import com.project.noris.mypage.dto.request.userInfoDto;
+import com.project.noris.mypage.repository.MypageRepository;
 import com.project.noris.mypage.service.MypageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,7 @@ import java.util.List;
 public class MypageController {
 
     private final Response response;
-
+    private final MypageRepository mypageRepository;
     private final MypageService mypageService;
     @GetMapping("/user")
     public ResponseEntity<?> MyPage(HttpServletRequest req) throws IOException {
@@ -45,9 +46,9 @@ public class MypageController {
 //        if (errors.hasErrors()) {
 //            return response.invalidFields(Helper.refineErrors(errors));
 //        }
-        JSONObject final_result = mypageService.getUserInfo(Integer.parseInt(req.getParameter("uid")));
-
-        return ResponseEntity.ok(final_result);
+//        JSONObject final_result = mypageService.getUserInfo(Integer.parseInt(req.getParameter("uid")));
+        Users user = mypageRepository.getUser(Integer.parseInt(req.getParameter("uid")));
+        return ResponseEntity.ok(user);
 
         //return response.success(defaultService.getOrganization(req.getCompany()));
     }
