@@ -22,4 +22,8 @@ public interface MypageRepository extends JpaRepository<Users, Long> {
     @Query(value = "update user set connect = :connect, image = :image where user.id = :uid", nativeQuery = true)
     int UpdateUser(@Param("connect") String connect, @Param("image") String image, @Param("uid") int uid);
 
+    @Transactional
+    @Modifying
+    @Query(value = "update user set connect = :connect where user.id = :uid", nativeQuery = true)
+    int UpdateUserKeepImage(@Param("connect") String connect, @Param("uid") int uid);
 }

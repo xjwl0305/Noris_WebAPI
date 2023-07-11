@@ -29,6 +29,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -68,11 +69,15 @@ public class MypageController {
         userInfoDto userinfo = new userInfoDto();
         userinfo.setConnect(connect);
         userinfo.setUid(uid);
-        if(imgFile==null){
-            mypageService.UpdateUserInfoWithoutImage(userinfo, imgPath);
-        }else {
+        if (imgFile!=null){
             mypageService.UpdateUserInfo(userinfo, imgFile, imgPath);
+        }else if(Objects.equals(imgPath, "keep")){
+            int update_status = mypageRepository.UpdateUserKeepImage(userinfo.getConnect(), Integer.parseInt(userinfo.getUid()));
+        }else{
+            mypageService.UpdateUserInfoWithoutImage(userinfo, imgPath);
         }
+
+
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 }
