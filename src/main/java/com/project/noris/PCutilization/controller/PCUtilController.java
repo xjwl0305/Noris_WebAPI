@@ -32,7 +32,7 @@ public class PCUtilController {
     private final PC_UserService pc_userService;
     private final Response response;
 
-    @GetMapping("/default")
+    @PostMapping("/default")
     public ResponseEntity<?> DefaultPage(@RequestBody @Validated DefaultRequestDto.DefaultData req, Errors errors) {
         // validation check
 
@@ -42,13 +42,12 @@ public class PCUtilController {
         JSONObject final_result = new JSONObject();
         List<OrganizationDto> result = defaultService.getOrganization(req.getCompany());
         List<TeamdataDto> result2 = defaultService.getTimeData(req.getUid());
-        final_result.put("Default", result);
         final_result.put("TeamData", result2);
         return ResponseEntity.ok(final_result);
        //return response.success(defaultService.getOrganization(req.getCompany()));
     }
 
-    @GetMapping("/per")
+    @PostMapping("/per")
     public ResponseEntity<?> GetPersonData(@RequestBody @Validated UserRequestDto req, Errors errors){
 
         if(errors.hasErrors()) {

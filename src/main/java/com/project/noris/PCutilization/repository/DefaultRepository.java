@@ -37,8 +37,17 @@ public interface DefaultRepository extends JpaRepository<Organization, Long>{
     Organization getDepartments(@Param("uid")int uid);
 
 
-    @Query(value = "select organization.id, organization.name from organization where parent_id = :id or department_id = :id limit 3", nativeQuery = true)
-    List<TeaminfoDto> getTeamData(@Param("id") Long id);
+    @Query(value = "WITH RECURSIVE Q AS (\n" +
+            "    SELECT ASSET.*\n" +
+            "    FROM organization ASSET\n" +
+            "    WHERE ASSET.department_id = :department_id\n" +
+            "  UNION ALL\n" +
+            "    SELECT ASSET.*\n" +
+            "    FROM organization ASSET\n" +
+            "  JOIN Q ON Q.department_id = ASSET.parent_id\n" +
+            "  )\n" +
+            "select * from q", nativeQuery = true)
+    List<TeaminfoDto> getTeamData(@Param("department_id") Long id);
 
 
     // 팀 인원 로그데이터 조회
