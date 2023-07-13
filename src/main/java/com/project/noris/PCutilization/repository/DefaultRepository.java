@@ -6,6 +6,7 @@ import com.project.noris.PCutilization.dto.TeamdataDto;
 import com.project.noris.PCutilization.dto.TeaminfoDto;
 import com.project.noris.entity.Department;
 import com.project.noris.entity.Organization;
+import com.project.noris.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -54,4 +55,8 @@ public interface DefaultRepository extends JpaRepository<Organization, Long>{
     @Query(value ="select u.name as user_name, log_data.log_time, log_data.process_name, log_data.process_title, log_data.status, log_data.action, log_data.user_id " +
             "from log_data left join user u on u.id = log_data.user_id left join department d on u.department_id = d.id where d.name = :department_name and DATE_FORMAT(log_data.log_time, '%Y-%m-%d') = :date", nativeQuery = true)
     List<TeamLogDataDto> getTeamLogData(@Param("department_name") String department_name, @Param("date") String date);
+
+    // 같은 부서 인원조회
+    @Query(value = "select u.id, u.name from user u where u.department_id in (select d.id from user u2 left join department d on u2.department_id = d.id where u2.id = :uid)", nativeQuery = true)
+    List<TeaminfoDto> getSameTeamMember(@Param("uid") int uid);
 }

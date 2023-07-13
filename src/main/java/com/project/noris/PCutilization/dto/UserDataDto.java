@@ -5,12 +5,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
 public class UserDataDto {
     TeamdataDto team;
-    UserDetailDataDto user;
+    List<UserDetailDataDto> user;
 
 }

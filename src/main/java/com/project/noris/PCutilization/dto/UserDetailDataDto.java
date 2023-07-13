@@ -15,7 +15,6 @@ public class UserDetailDataDto {
 
     private String user_name;
     private double percent;
-    private int total_time;
-    private int work_time;
-    List<TeamLogDataDto> date_total_data;
+    private double total_time;
+    private double work_time;
 }

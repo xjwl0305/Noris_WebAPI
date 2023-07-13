@@ -48,13 +48,22 @@ public class PCUtilController {
     }
 
     @PostMapping("/per")
-    public ResponseEntity<?> GetPersonData(@RequestBody @Validated UserRequestDto req, Errors errors){
+    public ResponseEntity<?> GetPersonData(@RequestBody @Validated UserRequestDto.UserRequest req, Errors errors){
 
         if(errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         UserDataDto result = pc_userService.getPersonData(req);
         return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/DailyPC")
+    public ResponseEntity<?> GetDailyPC(UserRequestDto.DailyPCRequest req){
+
+        JSONObject final_result = new JSONObject();
+        List<List<String>> dailyPCUitl = pc_userService.getDailyPCUitl(req.getUid(), req.getDate());
+        final_result.put("inactive_time", dailyPCUitl);
+        return ResponseEntity.ok(final_result);
     }
 
 }

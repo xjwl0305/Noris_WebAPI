@@ -1,20 +1,19 @@
-package com.project.noris.PCutilization.dto.Request;
+package com.project.noris.PCutilization.dto.Response;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
+import java.util.List;
 
 @Getter
 @Setter
 @JsonAutoDetect
-public class UserRequestDto {
+public class UserResponseDto {
 
     @Getter
     @Setter
-    public static class UserRequest {
+    public static class UserResponse {
 
         String date;
         int uid;
@@ -23,10 +22,9 @@ public class UserRequestDto {
     }
     @Getter
     @Setter
-    public static class DailyPCRequest {
+    public static class DailyPCResponse {
 
-        int uid;
-        String date;
+        List<String> inactive_time;
     }
 
 }

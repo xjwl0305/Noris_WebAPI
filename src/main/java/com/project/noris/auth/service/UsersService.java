@@ -67,7 +67,7 @@ public class UsersService {
     public ResponseEntity<?> login(UserRequestDto.Login login, HttpServletResponse Response) {
 
         if (usersRepository.findByEmail(login.getEmail()).orElse(null) == null) {
-            return response.fail("해당하는 유저가 존재하지 않습니다.", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("해당하는 유저가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
         }
 
         // 1. Login ID/PW 를 기반으로 Authentication 객체 생성

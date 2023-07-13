@@ -50,9 +50,17 @@ public class DefaultService {
             TeamdataDto a = getTeamData(log_data, datum.getName());
             list_data.add(a);
         }
-        return list_data;
+        return TeamDataAvg(list_data);
     }
 
+    List<TeamdataDto> TeamDataAvg(List<TeamdataDto> list_data){
+        float total_percent = 0;
+        for (TeamdataDto list_datum : list_data) {
+            total_percent += list_datum.getPercent();
+        }
+        list_data.get(0).setPercent(total_percent / list_data.size());
+        return list_data;
+    }
 
     TeamdataDto getTeamData(List<TeamLogDataDto> log_data, String department_name){
         Map<Long, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(TeamLogDataDto::getUser_id));
@@ -61,7 +69,7 @@ public class DefaultService {
         for (Long aLong : valid.keySet()) {
             List<TeamLogDataDto> teamLogDataDtos = valid.get(aLong);
             Long start_time = teamLogDataDtos.get(0).getLog_time().getTime();
-            Long end_time = teamLogDataDtos.get(teamLogDataDtos.size() -1).getLog_time().getTime();
+            Long end_time = teamLogDataDtos.get(teamLogDataDtos.size() -2).getLog_time().getTime();
             int count = 0;
             for (TeamLogDataDto teamLogDataDto : teamLogDataDtos) {
                 if(Objects.equals(teamLogDataDto.getStatus(), "inactive")){
@@ -69,7 +77,7 @@ public class DefaultService {
                 }
             }
             long work_time = (end_time - start_time)/1000;
-            long not_work_time = count * 300L;
+            long not_work_time = count * 600L;
             String a = "we";
             teamData.add((float) ((work_time-not_work_time)* 100)/work_time);
         }
