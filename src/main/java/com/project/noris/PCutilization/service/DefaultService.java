@@ -69,7 +69,7 @@ public class DefaultService {
         for (Long aLong : valid.keySet()) {
             List<TeamLogDataDto> teamLogDataDtos = valid.get(aLong);
             Long start_time = teamLogDataDtos.get(0).getLog_time().getTime();
-            Long end_time = teamLogDataDtos.get(teamLogDataDtos.size() -2).getLog_time().getTime();
+            Long end_time = teamLogDataDtos.get(teamLogDataDtos.size() -1).getLog_time().getTime();
             int count = 0;
             for (TeamLogDataDto teamLogDataDto : teamLogDataDtos) {
                 if(Objects.equals(teamLogDataDto.getStatus(), "inactive")){
@@ -84,7 +84,7 @@ public class DefaultService {
         double avg_data = teamData.stream()
                 .mapToDouble(a -> a)
                 .average().orElse(0);
-        return new TeamdataDto(department_name, avg_data, 40, 20);
+        return new TeamdataDto(department_name, avg_data,40, 20);
     }
 
 }

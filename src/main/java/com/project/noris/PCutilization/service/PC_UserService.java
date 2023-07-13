@@ -88,6 +88,12 @@ public class PC_UserService {
                    inactive_status = false;
             }
         }
+        if (inactive_status){
+            List<String> inactive_time = new ArrayList<>();
+            inactive_time.add(inactive_start);
+            inactive_time.add(inactive_end);
+            total_time.add(inactive_time);
+        }
         return total_time;
     }
 }
