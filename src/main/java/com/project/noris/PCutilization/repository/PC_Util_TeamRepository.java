@@ -1,19 +1,15 @@
 package com.project.noris.PCutilization.repository;
 
-import com.project.noris.PCutilization.dto.OrganizationDto;
 import com.project.noris.PCutilization.dto.TeamLogDataDto;
-import com.project.noris.PCutilization.dto.TeamdataDto;
 import com.project.noris.PCutilization.dto.TeaminfoDto;
-import com.project.noris.entity.Department;
 import com.project.noris.entity.Organization;
-import com.project.noris.entity.Users;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
-public interface DefaultRepository extends JpaRepository<Organization, Long>{
+
+public interface PC_Util_TeamRepository extends JpaRepository<Organization, Long>{
 
     // 회사이름으로 organization 최상위 id 조회
     @Query(value = "select department.id as company_org_id from department left join company c on department.company_id = c.id where c.name = :company and c.name = department.name", nativeQuery = true)
@@ -55,6 +51,10 @@ public interface DefaultRepository extends JpaRepository<Organization, Long>{
     @Query(value ="select u.name as user_name, log_data.log_time, log_data.process_name, log_data.process_title, log_data.status, log_data.action, log_data.user_id " +
             "from log_data left join user u on u.id = log_data.user_id left join department d on u.department_id = d.id where d.name = :department_name and DATE_FORMAT(log_data.log_time, '%Y-%m-%d') = :date", nativeQuery = true)
     List<TeamLogDataDto> getTeamLogData(@Param("department_name") String department_name, @Param("date") String date);
+    @Query(value ="select u.name as user_name, log_data.log_time, log_data.process_name, log_data.process_title, log_data.status, log_data.action, log_data.user_id " +
+            "from log_data left join user u on u.id = log_data.user_id left join department d on u.department_id = d.id where d.name = :department_name and log_data.log_time BETWEEN :date AND :date2", nativeQuery = true)
+    List<TeamLogDataDto> getTeamLogDataDate(@Param("department_name") String department_name, @Param("date") String date, @Param("date2") String date2);
+
 
     // 같은 부서 인원조회
     @Query(value = "select u.id, u.name from user u where u.department_id in (select d.id from user u2 left join department d on u2.department_id = d.id where u2.id = :uid)", nativeQuery = true)

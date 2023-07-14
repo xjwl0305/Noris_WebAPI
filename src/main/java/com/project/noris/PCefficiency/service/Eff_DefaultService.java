@@ -2,10 +2,7 @@ package com.project.noris.PCefficiency.service;
 
 
 import com.project.noris.PCutilization.dto.TeamLogDataDto;
-import com.project.noris.PCutilization.dto.TeamdataDto;
-import com.project.noris.PCutilization.dto.TeaminfoDto;
-import com.project.noris.PCutilization.repository.DefaultRepository;
-import com.project.noris.entity.Organization;
+import com.project.noris.PCutilization.repository.PC_Util_TeamRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,7 +15,7 @@ import java.util.*;
 @Service
 public class Eff_DefaultService {
 
-    private final DefaultRepository defaultRepository;
+    private final PC_Util_TeamRepository PCUtilTeamRepository;
 
     public List<Map<String, Double>> getEffData(int uid, String department_name) {
 
@@ -26,10 +23,9 @@ public class Eff_DefaultService {
         String format = "yyyy-MM-dd";
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         cal.add(Calendar.DATE, -1);
-//        String date = sdf.format(cal.getTime());
-        String date = "2023-06-07";
+        String date = sdf.format(cal.getTime());
 
-        List<TeamLogDataDto> log_data = defaultRepository.getTeamLogData(department_name, date);
+        List<TeamLogDataDto> log_data = PCUtilTeamRepository.getTeamLogData(department_name, date);
 
         return getTeamData(log_data);
     }

@@ -1,34 +1,22 @@
 package com.project.noris.mypage.controller;
 
 
-import com.project.noris.PCutilization.dto.OrganizationDto;
-import com.project.noris.PCutilization.dto.Request.DefaultRequestDto;
-import com.project.noris.PCutilization.dto.TeamdataDto;
 import com.project.noris.auth.dto.Response;
 import com.project.noris.entity.Users;
 import com.project.noris.lib.Helper;
-import com.project.noris.mypage.dto.request.mypageRequestDto;
 import com.project.noris.mypage.dto.request.userInfoDto;
 import com.project.noris.mypage.repository.MypageRepository;
 import com.project.noris.mypage.service.MypageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.Errors;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 @Slf4j

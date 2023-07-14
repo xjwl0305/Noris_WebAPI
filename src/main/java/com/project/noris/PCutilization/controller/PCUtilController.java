@@ -1,13 +1,12 @@
 package com.project.noris.PCutilization.controller;
 
 
-import com.project.noris.PCutilization.dto.OrganizationDto;
-import com.project.noris.PCutilization.dto.Request.DefaultRequestDto;
-import com.project.noris.PCutilization.dto.Request.UserRequestDto;
+import com.project.noris.PCutilization.dto.Request.PCUtilTeamRequestDto;
+import com.project.noris.PCutilization.dto.Request.PCUtilUserRequestDto;
 import com.project.noris.PCutilization.dto.TeamdataDto;
 import com.project.noris.PCutilization.dto.UserDataDto;
-import com.project.noris.PCutilization.service.DefaultService;
-import com.project.noris.PCutilization.service.PC_UserService;
+import com.project.noris.PCutilization.service.PC_Util_TeamService;
+import com.project.noris.PCutilization.service.PC_Util_UserService;
 import com.project.noris.auth.dto.Response;
 import com.project.noris.lib.Helper;
 import lombok.RequiredArgsConstructor;
@@ -27,41 +26,41 @@ import java.util.List;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PCUtilController {
 
-    private final DefaultService defaultService;
+    private final PC_Util_TeamService PCUtilTeamService;
 
-    private final PC_UserService pc_userService;
+    private final PC_Util_UserService pc_Util_userService;
     private final Response response;
 
-    @PostMapping("/default")
-    public ResponseEntity<?> DefaultPage(@RequestBody @Validated DefaultRequestDto.DefaultData req, Errors errors) {
+    @PostMapping("/team")
+    public ResponseEntity<?> DefaultPage(@RequestBody @Validated PCUtilTeamRequestDto.TeamData req, Errors errors) {
         // validation check
 
         if (errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         JSONObject final_result = new JSONObject();
-        List<OrganizationDto> result = defaultService.getOrganization(req.getCompany());
-        List<TeamdataDto> result2 = defaultService.getTimeData(req.getUid());
+//        List<OrganizationDto> result = defaultService.getOrganization(req.getCompany());
+        List<TeamdataDto> result2 = PCUtilTeamService.getTimeData(req.getUid(), req.getDate());
         final_result.put("TeamData", result2);
         return ResponseEntity.ok(final_result);
        //return response.success(defaultService.getOrganization(req.getCompany()));
     }
 
     @PostMapping("/per")
-    public ResponseEntity<?> GetPersonData(@RequestBody @Validated UserRequestDto.UserRequest req, Errors errors){
+    public ResponseEntity<?> GetPersonData(@RequestBody @Validated PCUtilUserRequestDto.UserRequest req, Errors errors){
 
         if(errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));
         }
-        UserDataDto result = pc_userService.getPersonData(req);
+        UserDataDto result = pc_Util_userService.getPersonData(req);
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/DailyPC")
-    public ResponseEntity<?> GetDailyPC(UserRequestDto.DailyPCRequest req){
+    public ResponseEntity<?> GetDailyPC(PCUtilUserRequestDto.DailyPCRequest req){
 
         JSONObject final_result = new JSONObject();
-        List<List<String>> dailyPCUitl = pc_userService.getDailyPCUitl(req.getUid(), req.getDate());
+        List<List<String>> dailyPCUitl = pc_Util_userService.getDailyPCUitl(req.getUid(), req.getDate());
         final_result.put("inactive_time", dailyPCUitl);
         return ResponseEntity.ok(final_result);
     }

@@ -1,13 +1,11 @@
 package com.project.noris.PCutilization.service;
 
 import com.project.noris.PCutilization.dto.*;
-import com.project.noris.PCutilization.dto.Request.UserRequestDto;
-import com.project.noris.PCutilization.dto.Response.UserResponseDto;
-import com.project.noris.PCutilization.repository.DefaultRepository;
-import com.project.noris.PCutilization.repository.PersonRepository;
+import com.project.noris.PCutilization.dto.Request.PCUtilUserRequestDto;
+import com.project.noris.PCutilization.repository.PC_Util_TeamRepository;
+import com.project.noris.PCutilization.repository.PC_Util_UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,16 +17,16 @@ import java.util.stream.Collectors;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class PC_UserService {
+public class PC_Util_UserService {
 
-    private final PersonRepository personRepository;
-    private final DefaultRepository defaultRepository;
-    private final DefaultService defaultService;
-    public UserDataDto getPersonData(UserRequestDto.UserRequest req){
-        List<TeamLogDataDto> log_data = defaultRepository.getTeamLogData(req.getDepartment_name(), req.getDate());
+    private final PC_Util_UserRepository PCUtilUserRepository;
+    private final PC_Util_TeamRepository PCUtilTeamRepository;
+    private final PC_Util_TeamService PCUtilTeamService;
+    public UserDataDto getPersonData(PCUtilUserRequestDto.UserRequest req){
+        List<TeamLogDataDto> log_data = PCUtilTeamRepository.getTeamLogData(req.getDepartment_name(), req.getDate());
         List<UserDetailDataDto> List_UserDetail = new ArrayList<UserDetailDataDto>();
-        TeamdataDto team = defaultService.getTeamData(log_data, req.getDepartment_name());
-        List<TeaminfoDto> sameTeamMember = defaultRepository.getSameTeamMember(req.getUid());
+        TeamdataDto team = PCUtilTeamService.getTeamData(log_data, req.getDepartment_name());
+        List<TeaminfoDto> sameTeamMember = PCUtilTeamRepository.getSameTeamMember(req.getUid());
         for (TeaminfoDto users : sameTeamMember) {
             UserDetailDataDto person = getUserDetail(Math.toIntExact(users.getId()), users.getName(), req.getDate());
             List_UserDetail.add(person);
@@ -38,12 +36,12 @@ public class PC_UserService {
     }
 
     public UserDetailDataDto getUserDetail(int uid, String name, String date){
-        List<TeamLogDataDto> userLog = personRepository.getUserLog(uid, date);
+        List<TeamLogDataDto> userLog = PCUtilUserRepository.getUserLog(uid, date);
         return getUserData(userLog, name);
     }
 
     public UserDetailDataDto getUserData(List<TeamLogDataDto> log_data, String user_name){
-        Map<Long, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(TeamLogDataDto::getUser_id));
+        Map<String, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(TeamLogDataDto::getUser_name));
         List<Float> userData = new ArrayList<>();
         Long start_time = log_data.get(0).getLog_time().getTime();
         Long end_time = log_data.get(log_data.size() -1).getLog_time().getTime();
@@ -66,7 +64,7 @@ public class PC_UserService {
         return new UserDetailDataDto(user_name, avg_data, (float) work_time/3600, (float)(work_time-not_work_time)/3600);
     }
     public List<List<String>> getDailyPCUitl(int uid, String date){
-        List<TeamLogDataDto> log_data = personRepository.getUserLog(uid, date);
+        List<TeamLogDataDto> log_data = PCUtilUserRepository.getUserLog(uid, date);
         String inactive_start = "";
         String inactive_end = "";
         boolean inactive_status = false;

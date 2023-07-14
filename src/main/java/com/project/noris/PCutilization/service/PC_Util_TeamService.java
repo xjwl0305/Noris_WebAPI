@@ -2,51 +2,46 @@ package com.project.noris.PCutilization.service;
 
 
 import com.project.noris.PCutilization.dto.OrganizationDto;
-import com.project.noris.PCutilization.dto.Request.DefaultRequestDto;
 import com.project.noris.PCutilization.dto.Response.DefaultResponseDto;
 import com.project.noris.PCutilization.dto.TeamLogDataDto;
 import com.project.noris.PCutilization.dto.TeamdataDto;
 import com.project.noris.PCutilization.dto.TeaminfoDto;
-import com.project.noris.PCutilization.repository.DefaultRepository;
-import com.project.noris.entity.Department;
+import com.project.noris.PCutilization.repository.PC_Util_TeamRepository;
 import com.project.noris.entity.Organization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class DefaultService {
+public class PC_Util_TeamService {
 
-    private final DefaultRepository defaultRepository;
+    private final PC_Util_TeamRepository PCUtilTeamRepository;
     public List<DefaultResponseDto.DefaultData> items;
 
     public List<OrganizationDto> getOrganization(String company) {
-        int company_id = defaultRepository.getCompanyID(company);
+        int company_id = PCUtilTeamRepository.getCompanyID(company);
 
-        final List<Organization> all = defaultRepository.findAllByParentIsNull(company_id);
+        final List<Organization> all = PCUtilTeamRepository.findAllByParentIsNull(company_id);
         return all.stream().map(OrganizationDto::new).collect(Collectors.toList());
     }
 
-    public List<TeamdataDto> getTimeData(int uid){
+    public List<TeamdataDto> getTimeData(int uid, List<String> date){
         ArrayList<TeamdataDto> list_data = new ArrayList<>();
-        Organization departments = defaultRepository.getDepartments(uid);
-        List<TeaminfoDto> data = defaultRepository.getTeamData(departments.getId());
-        Calendar cal = Calendar.getInstance();
-        String format = "yyyy-MM-dd";
-        SimpleDateFormat sdf = new SimpleDateFormat(format);
-        cal.add(Calendar.DATE, -1);
-        String date = sdf.format(cal.getTime());
-//        String date = "2023-06-07";
+        Organization departments = PCUtilTeamRepository.getDepartments(uid);
+        List<TeaminfoDto> data = PCUtilTeamRepository.getTeamData(departments.getId());
         for (TeaminfoDto datum : data) {
-            List<TeamLogDataDto> log_data = defaultRepository.getTeamLogData(datum.getName(), date);
+            List<TeamLogDataDto> log_data = new ArrayList<>();
+            if (date.size() > 1){
+                log_data = PCUtilTeamRepository.getTeamLogDataDate(datum.getName(), date.get(0), date.get(1));
+            }else {
+                log_data = PCUtilTeamRepository.getTeamLogData(datum.getName(), date.get(0));
+            }
+
             TeamdataDto a = getTeamData(log_data, datum.getName());
             list_data.add(a);
         }
