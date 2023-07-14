@@ -17,9 +17,10 @@ public class PCUtilTeamRequestDto {
     public static class TeamData {
         private int uid;
 
-//        @NotEmpty(message = "회사이름은 필수 입력값입니다.")
-//        private String company;
-
         private List<String> date;
+        @NotEmpty(message = "부서이름은 필수 입력값입니다.")
+        private String department_name;
+        @NotEmpty(message = "회사이름은 필수 입력값입니다.")
+        private String company_name;
     }
 }

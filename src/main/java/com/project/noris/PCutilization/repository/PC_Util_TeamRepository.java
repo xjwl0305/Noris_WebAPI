@@ -30,8 +30,8 @@ public interface PC_Util_TeamRepository extends JpaRepository<Organization, Long
     List<Organization> findAllByParentIsNull(@Param("company_id") int company_id);
 
     // 소속 팀별포함 하위팀 조회
-    @Query(value = "select * from organization where name in (select department.name from department left join user u on department.id = u.department_id where u.id = :uid)", nativeQuery = true)
-    Organization getDepartments(@Param("uid")int uid);
+    @Query(value = "select * from organization where name = :department_name and company_id in (select id from company where company.name = :company_name)", nativeQuery = true)
+    Organization getDepartments(@Param("department_name") String department_name, @Param("company_name") String company_name);
 
 
     @Query(value = "WITH RECURSIVE Q AS (\n" +

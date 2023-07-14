@@ -30,9 +30,9 @@ public class PC_Util_TeamService {
         return all.stream().map(OrganizationDto::new).collect(Collectors.toList());
     }
 
-    public List<TeamdataDto> getTimeData(int uid, List<String> date){
+    public List<TeamdataDto> getTimeData(int uid, List<String> date, String department_name, String company_name){
         ArrayList<TeamdataDto> list_data = new ArrayList<>();
-        Organization departments = PCUtilTeamRepository.getDepartments(uid);
+        Organization departments = PCUtilTeamRepository.getDepartments(department_name, company_name);
         List<TeaminfoDto> data = PCUtilTeamRepository.getTeamData(departments.getId());
         for (TeaminfoDto datum : data) {
             List<TeamLogDataDto> log_data = new ArrayList<>();

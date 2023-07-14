@@ -40,7 +40,7 @@ public class PCUtilController {
         }
         JSONObject final_result = new JSONObject();
 //        List<OrganizationDto> result = defaultService.getOrganization(req.getCompany());
-        List<TeamdataDto> result2 = PCUtilTeamService.getTimeData(req.getUid(), req.getDate());
+        List<TeamdataDto> result2 = PCUtilTeamService.getTimeData(req.getUid(), req.getDate(), req.getDepartment_name(), req.getCompany_name());
         final_result.put("TeamData", result2);
         return ResponseEntity.ok(final_result);
        //return response.success(defaultService.getOrganization(req.getCompany()));
