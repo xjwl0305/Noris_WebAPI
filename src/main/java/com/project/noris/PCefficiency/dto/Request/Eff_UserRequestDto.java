@@ -1,6 +1,5 @@
 package com.project.noris.PCefficiency.dto.Request;
 
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +9,8 @@ import javax.validation.constraints.NotEmpty;
 @Getter
 @Setter
 @JsonAutoDetect
-public class DefaultRequestDto {
+public class Eff_UserRequestDto {
+
 
     private int uid;
 
@@ -18,4 +18,6 @@ public class DefaultRequestDto {
     private String company;
 
     private String department_name;
+
+    private String date;
 }

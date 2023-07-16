@@ -2,24 +2,21 @@ package com.project.noris.lib.Service;
 
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class S3Uploader {
+public class S3Service {
     private final AmazonS3Client amazonS3Client;
     @Value("${cloud.aws.s3.bucket}")
     private String bucket;
@@ -69,5 +66,33 @@ public class S3Uploader {
             return Optional.of(convertFile);
         }
         return Optional.empty();
+    }
+
+    public List<String> readObject(String storedFileName) throws IOException{
+        S3Object o = amazonS3Client.getObject(new GetObjectRequest(bucket, storedFileName));
+        S3ObjectInputStream ois = null;
+        BufferedReader br = null;
+        List<String> process_list = new ArrayList<>();
+        // Read the CSV one line at a time and process it.
+        try {
+            ois = o.getObjectContent();
+            System.out.println ("ois = " + ois);
+            br = new BufferedReader (new InputStreamReader(ois, "UTF-8"));
+            String line;
+            while ((line = br.readLine()) != null) {
+
+                // Store 1 record in an array separated by commas
+                line = line.replaceAll("\\\"","");
+                process_list.add(line);
+            }
+        }finally {
+            if(ois != null){
+                ois.close();
+            }
+            if(br != null){
+                br.close();
+            }
+        }
+        return process_list;
     }
 }

@@ -15,12 +15,12 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class Eff_SuperUserService {
+public class Eff_UserService {
 
     private final PC_Util_TeamRepository PCUtilTeamRepository;
 //    private final PCEfficiencyRepository pcEfficiencyRepository;
-    private final Eff_DefaultService effDefaultService;
-    public List<Map<String, Double>> getEffData(int uid, String department_name, String date) {
+    private final Eff_TeamService effDefaultService;
+    public List<TeamLogDataDto> getEffData(int uid, String department_name, String date) {
 
         Calendar cal = Calendar.getInstance();
         String format = "yyyy-MM-dd";
@@ -30,7 +30,8 @@ public class Eff_SuperUserService {
 //        String date = "2023-06-07";
 
         List<TeamLogDataDto> log_data = PCUtilTeamRepository.getTeamLogData(department_name, date);
-
-        return effDefaultService.getTeamData(log_data);
+        // 수정해야함
+        //return effDefaultService.getTeamData(log_data);
+        return log_data;
     }
 }

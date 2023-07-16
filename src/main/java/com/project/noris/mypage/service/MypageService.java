@@ -1,42 +1,28 @@
 package com.project.noris.mypage.service;
 
 import com.project.noris.entity.Users;
-import com.project.noris.lib.Service.S3Uploader;
-import com.project.noris.mypage.dto.request.mypageRequestDto;
+import com.project.noris.lib.Service.S3Service;
 import com.project.noris.mypage.dto.request.userInfoDto;
 import com.project.noris.mypage.repository.MypageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import sun.tools.jconsole.JConsole;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.*;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
 public class MypageService{
 
-    private final S3Uploader s3Uploader;
+    private final S3Service s3Service;
     private final MypageRepository mypageRepository;
 
     public JSONObject getUserInfo(int uid) throws IOException {
@@ -64,7 +50,7 @@ public class MypageService{
         String filepath = "profile";
         File uploadFile = convert(imgFile)
                 .orElseThrow(() -> new IllegalArgumentException());
-        String uploadURL = s3Uploader.upload(uploadFile, filepath);
+        String uploadURL = s3Service.upload(uploadFile, filepath);
 
         int update_status = mypageRepository.UpdateUser(userInfo.getConnect(), uploadURL, Integer.parseInt(userInfo.getUid()));
         if(update_status == 0){
