@@ -60,7 +60,7 @@ public class PCUtilController {
     public ResponseEntity<?> GetDailyPC(PCUtilUserRequestDto.DailyPCRequest req){
 
         JSONObject final_result = new JSONObject();
-        List<List<String>> dailyPCUitl = pc_Util_userService.getDailyPCUitl(req.getUid(), req.getDate());
+        List<List<String>> dailyPCUitl = pc_Util_userService.getDailyPCUitl(req.getUser_name(), req.getDate());
         final_result.put("inactive_time", dailyPCUitl);
         return ResponseEntity.ok(final_result);
     }

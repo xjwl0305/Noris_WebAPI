@@ -22,7 +22,7 @@ public class PCUtilUserRequestDto {
     @Setter
     public static class DailyPCRequest {
 
-        int uid;
+        String user_name;
         String date;
     }
 

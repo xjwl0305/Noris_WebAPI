@@ -57,6 +57,6 @@ public interface PC_Util_TeamRepository extends JpaRepository<Organization, Long
 
 
     // 같은 부서 인원조회
-    @Query(value = "select u.id, u.name from user u where u.department_id in (select d.id from user u2 left join department d on u2.department_id = d.id where u2.id = :uid)", nativeQuery = true)
-    List<TeaminfoDto> getSameTeamMember(@Param("uid") int uid);
+    @Query(value = "select u.id, u.name from user u where u.department_id in (select d.id from user u2 left join department d on u2.department_id = d.id where u2.name = :user_name)", nativeQuery = true)
+    List<TeaminfoDto> getSameTeamMember(@Param("user_name") String user_name);
 }

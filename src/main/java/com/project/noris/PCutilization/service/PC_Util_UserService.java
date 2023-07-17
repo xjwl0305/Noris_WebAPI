@@ -26,7 +26,7 @@ public class PC_Util_UserService {
         List<TeamLogDataDto> log_data = PCUtilTeamRepository.getTeamLogData(req.getDepartment_name(), req.getDate());
         List<UserDetailDataDto> List_UserDetail = new ArrayList<UserDetailDataDto>();
         TeamdataDto team = PCUtilTeamService.getTeamData(log_data, req.getDepartment_name());
-        List<TeaminfoDto> sameTeamMember = PCUtilTeamRepository.getSameTeamMember(req.getUid());
+        List<TeaminfoDto> sameTeamMember = PCUtilTeamRepository.getSameTeamMember(req.getUser_name());
         for (TeaminfoDto users : sameTeamMember) {
             UserDetailDataDto person = getUserDetail(Math.toIntExact(users.getId()), users.getName(), req.getDate());
             List_UserDetail.add(person);
@@ -36,7 +36,10 @@ public class PC_Util_UserService {
     }
 
     public UserDetailDataDto getUserDetail(int uid, String name, String date){
-        List<TeamLogDataDto> userLog = PCUtilUserRepository.getUserLog(uid, date);
+        List<TeamLogDataDto> userLog = PCUtilUserRepository.getUserLog(name, date);
+        if(userLog.size() < 1){
+            return new UserDetailDataDto(name, 0, 0, 0);
+        }
         return getUserData(userLog, name);
     }
 
@@ -63,8 +66,8 @@ public class PC_Util_UserService {
 
         return new UserDetailDataDto(user_name, avg_data, (float) work_time/3600, (float)(work_time-not_work_time)/3600);
     }
-    public List<List<String>> getDailyPCUitl(int uid, String date){
-        List<TeamLogDataDto> log_data = PCUtilUserRepository.getUserLog(uid, date);
+    public List<List<String>> getDailyPCUitl(String user_name, String date){
+        List<TeamLogDataDto> log_data = PCUtilUserRepository.getUserLog(user_name, date);
         String inactive_start = "";
         String inactive_end = "";
         boolean inactive_status = false;
