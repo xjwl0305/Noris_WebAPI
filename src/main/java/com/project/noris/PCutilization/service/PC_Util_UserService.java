@@ -71,7 +71,7 @@ public class PC_Util_UserService {
         List<List<String>> total_time = new ArrayList<>();
         for (TeamLogDataDto LogDataDto : log_data) {
             if(Objects.equals(LogDataDto.getStatus(), "inactive") && !inactive_status){
-                String[] split = LogDataDto.getAction().split(",");
+                String[] split = LogDataDto.getAction().split(", ");
                 inactive_start = split[0];
                 inactive_end = split[1];
                 inactive_status = true;
