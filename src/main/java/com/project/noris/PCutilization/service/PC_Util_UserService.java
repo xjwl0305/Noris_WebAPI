@@ -76,7 +76,7 @@ public class PC_Util_UserService {
                 inactive_end = split[1];
                 inactive_status = true;
             }else if(Objects.equals(LogDataDto.getStatus(), "inactive") && inactive_status){
-                String[] split = LogDataDto.getAction().split(",");
+                String[] split = LogDataDto.getAction().split(", ");
                 inactive_end = split[1];
             }else if(!Objects.equals(LogDataDto.getStatus(), "inactive") && inactive_status){
                    List<String> inactive_time = new ArrayList<>();
