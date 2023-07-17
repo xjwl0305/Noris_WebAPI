@@ -2,10 +2,12 @@ package com.project.noris.PCefficiency.controller;
 
 
 import com.project.noris.PCefficiency.dto.Eff_TeamDataDto;
+import com.project.noris.PCefficiency.dto.Eff_UserDataDto;
 import com.project.noris.PCefficiency.dto.Request.Eff_TeamRequestDto;
 import com.project.noris.PCefficiency.dto.Request.Eff_UserRequestDto;
 import com.project.noris.PCefficiency.service.Eff_UserService;
 import com.project.noris.PCefficiency.service.Eff_TeamService;
+import com.project.noris.PCutilization.dto.TeamLogDataDto;
 import com.project.noris.auth.dto.Response;
 import com.project.noris.lib.Helper;
 import lombok.RequiredArgsConstructor;
@@ -40,23 +42,22 @@ public class PCEfficiencyController {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         JSONObject final_result = new JSONObject();
-        List<Eff_TeamDataDto> effData = effDefaultService.getEffData(req.getDate(), req.getDepartment_name(), req.getCompany_name());
+        List<Eff_TeamDataDto.final_data> effData = effDefaultService.getEffData(req.getDate(), req.getDepartment_name(), req.getCompany_name());
         final_result.put("team_data", effData);
         return ResponseEntity.ok(final_result);
         //return response.success(defaultService.getOrganization(req.getCompany()));
     }
 
-    @GetMapping("/super")
-    public ResponseEntity<?> SuperUserPage(@RequestBody @Validated Eff_UserRequestDto req, Errors errors) {
+    @PostMapping("/user")
+    public ResponseEntity<?> UserPage(@RequestBody @Validated Eff_UserRequestDto req, Errors errors) throws IOException {
         // validation check
 
         if (errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         JSONObject final_result = new JSONObject();
-        //List<Map<String, Double>> result = effSuperUserService.getEffData(req.getUid(), req.getDepartment_name(), req.getDate());
-        final_result.put("Percent_Data", "result");
-        return ResponseEntity.ok(final_result);
+        Eff_UserDataDto.final_data result = effSuperUserService.getEffData(req.getUid(), req.getDepartment_name(), req.getDate());
+        return ResponseEntity.ok(result);
         //return response.success(defaultService.getOrganization(req.getCompany()));
     }
 }

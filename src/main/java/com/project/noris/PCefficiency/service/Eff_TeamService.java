@@ -3,7 +3,6 @@ package com.project.noris.PCefficiency.service;
 
 import com.project.noris.PCefficiency.dto.Eff_TeamDataDto;
 import com.project.noris.PCutilization.dto.TeamLogDataDto;
-import com.project.noris.PCutilization.dto.TeamdataDto;
 import com.project.noris.PCutilization.dto.TeaminfoDto;
 import com.project.noris.PCutilization.repository.PC_Util_TeamRepository;
 import com.project.noris.entity.Organization;
@@ -13,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Slf4j
@@ -24,15 +22,15 @@ public class Eff_TeamService {
 private final PC_Util_TeamRepository PCUtilTeamRepository;
     private final S3Service s3Service;
 
-    public  List<Eff_TeamDataDto> getEffData(List<String> date, String department_name, String company_name) throws IOException {
+    public  List<Eff_TeamDataDto.final_data> getEffData(List<String> date, String department_name, String company_name) throws IOException {
         List<String> process_list = s3Service.readObject("process_list/process_list.csv");
         Organization departments = PCUtilTeamRepository.getDepartments(department_name, company_name);
         List<TeaminfoDto> data = PCUtilTeamRepository.getTeamData(departments.getId());
-        List<Eff_TeamDataDto> list_data = new ArrayList<>();
+        List<Eff_TeamDataDto.final_data> list_data = new ArrayList<>();
         //List<TeamLogDataDto> log_data = new ArrayList<>();
         for (TeaminfoDto datum : data) {
             List<TeamLogDataDto> log_data = new ArrayList<>();
-            Eff_TeamDataDto teamData = new Eff_TeamDataDto();
+            Eff_TeamDataDto.final_data teamData = new Eff_TeamDataDto.final_data();
             if (date.size() > 1) {
                 log_data = PCUtilTeamRepository.getTeamLogDataDate(datum.getName(), date.get(0), date.get(1));
             } else {
@@ -51,12 +49,12 @@ private final PC_Util_TeamRepository PCUtilTeamRepository;
         return list_data;
     }
 
-    Eff_TeamDataDto getTeamData(List < TeamLogDataDto > log_data, List < String > process_contain){
+    Eff_TeamDataDto.final_data getTeamData(List < TeamLogDataDto > log_data, List < String > process_contain){
         String standard = "";
         Date standard_start = new Date();
         List<String> process_list = new ArrayList<>();
         List<Long> process_time_list = new ArrayList<>();
-        List<Double> process_percent_list = new ArrayList<>();
+        List<List<Double>> process_percent_list = new ArrayList<>();
         Long start_time = log_data.get(0).getLog_time().getTime();
         Long end_time = log_data.get(log_data.size() - 1).getLog_time().getTime();
         Long work_time = (end_time - start_time) / 1000;
@@ -93,17 +91,23 @@ private final PC_Util_TeamRepository PCUtilTeamRepository;
         not_work_time = not_work_time / 1000;
         long l = Math.round(((double) not_work_time / (double) work_time) * 100 * 1000) / 1000;
         for (Long i : process_time_list) {
-            process_percent_list.add(Math.round(((double) i / (double) work_time) * 100 * 100D) / 100D);
+            List<Double> objects = new ArrayList<>();
+            objects.add(Math.round(((double) i / (double) work_time) * 100 * 100D) / 100D);
+            objects.add(Double.valueOf(Math.round(i/60)));
+            process_percent_list.add(objects);
         }
 
-        List<Map<String, Double>> result = new ArrayList<>();
+        List<Eff_TeamDataDto.minimum_data> result = new ArrayList<>();
         for (int i = 0; i < process_list.size(); i++) {
-            Map<String, Double> data = new HashMap<>();
-            data.put(process_list.get(i), process_percent_list.get(i));
-            result.add(data);
+            Eff_TeamDataDto.minimum_data minimum_data = new Eff_TeamDataDto.minimum_data();
+            minimum_data.setProcess_name(process_list.get(i));
+            minimum_data.setProgram_percent(process_percent_list.get(i).get(0));
+            minimum_data.setProgram_eff_time(process_percent_list.get(i).get(1));
+
+            result.add(minimum_data);
         }
-        Eff_TeamDataDto eff_teamDataDto = new Eff_TeamDataDto();
-        eff_teamDataDto.setProgram_percent(result);
+        Eff_TeamDataDto.final_data eff_teamDataDto = new Eff_TeamDataDto.final_data();
+        eff_teamDataDto.setProgram_eff(result);
         eff_teamDataDto.setEfficiency_percent(100-l);
         return eff_teamDataDto;
     }
