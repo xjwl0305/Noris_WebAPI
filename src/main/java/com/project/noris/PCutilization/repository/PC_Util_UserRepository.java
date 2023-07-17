@@ -14,4 +14,8 @@ public interface PC_Util_UserRepository extends JpaRepository<Users, Long> {
     @Query(value = "select u.name as user_name, log_data.log_time, log_data.process_name, log_data.process_title, log_data.status, log_data.action, log_data.user_id from log_data left join user u on u.id = log_data.user_id\n" +
             "                                                                                                                                                 where u.name = :user_name and DATE(log_time) = :date and log_data.status not in ('Start', 'Exit')", nativeQuery = true)
     List<TeamLogDataDto> getUserLog(@Param("user_name") String user_name, @Param("date") String date);
+
+    @Query(value = "select u.name as user_name, log_data.log_time, log_data.process_name, log_data.process_title, log_data.status, log_data.action, log_data.user_id from log_data left join user u on u.id = log_data.user_id\n" +
+            "                                                                                                                                                 where u.name = :user_name and  log_data.log_time BETWEEN :date AND :date2 and log_data.status not in ('Start', 'Exit')", nativeQuery = true)
+    List<TeamLogDataDto> getUserLogDate(@Param("user_name") String user_name, @Param("date") String date, @Param("date2") String date2);
 }

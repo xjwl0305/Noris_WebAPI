@@ -23,7 +23,13 @@ public class PC_Util_UserService {
     private final PC_Util_TeamRepository PCUtilTeamRepository;
     private final PC_Util_TeamService PCUtilTeamService;
     public UserDataDto getPersonData(PCUtilUserRequestDto.UserRequest req){
-        List<TeamLogDataDto> log_data = PCUtilTeamRepository.getTeamLogData(req.getDepartment_name(), req.getDate());
+        List<TeamLogDataDto> log_data = new ArrayList<>();
+        if(req.getDate().size() > 1){
+            log_data = PCUtilTeamRepository.getTeamLogDataDate(req.getDepartment_name(), req.getDate().get(0), req.getDate().get(1));
+        }else{
+            log_data = PCUtilTeamRepository.getTeamLogData(req.getDepartment_name(), req.getDate().get(0));
+        }
+
         List<UserDetailDataDto> List_UserDetail = new ArrayList<UserDetailDataDto>();
         TeamdataDto team = PCUtilTeamService.getTeamData(log_data, req.getDepartment_name());
         List<TeaminfoDto> sameTeamMember = PCUtilTeamRepository.getSameTeamMember(req.getUser_name());
@@ -35,8 +41,13 @@ public class PC_Util_UserService {
         return new UserDataDto(team, List_UserDetail);
     }
 
-    public UserDetailDataDto getUserDetail(int uid, String name, String date){
-        List<TeamLogDataDto> userLog = PCUtilUserRepository.getUserLog(name, date);
+    public UserDetailDataDto getUserDetail(int uid, String name, List<String> date){
+        List<TeamLogDataDto> userLog = new ArrayList<>();
+        if(date.size() > 1){
+            userLog = PCUtilUserRepository.getUserLogDate(name, date.get(0), date.get(1));
+        }else{
+            userLog = PCUtilUserRepository.getUserLog(name, date.get(0));
+        }
         if(userLog.size() < 1){
             return new UserDetailDataDto(name, 0, 0, 0);
         }
@@ -56,7 +67,7 @@ public class PC_Util_UserService {
             }
         }
         long work_time = (end_time - start_time)/1000;
-        long not_work_time = count * 300L;
+        long not_work_time = count * 600L;
         userData.add((float) ((work_time-not_work_time)* 100)/work_time);
         double avg_data = userData.stream()
                 .
