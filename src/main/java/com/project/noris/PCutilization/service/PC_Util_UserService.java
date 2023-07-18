@@ -32,7 +32,7 @@ public class PC_Util_UserService {
 
         List<UserDetailDataDto> List_UserDetail = new ArrayList<UserDetailDataDto>();
         TeamdataDto team = PCUtilTeamService.getTeamData(log_data, req.getDepartment_name());
-        List<TeaminfoDto> sameTeamMember = PCUtilTeamRepository.getSameTeamMember(req.getUser_name());
+        List<TeaminfoDto> sameTeamMember = PCUtilTeamRepository.getSameTeamMemberByDepartment(req.getDepartment_name());
         for (TeaminfoDto users : sameTeamMember) {
             UserDetailDataDto person = getUserDetail(Math.toIntExact(users.getId()), users.getName(), req.getDate());
             List_UserDetail.add(person);
