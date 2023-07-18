@@ -17,7 +17,6 @@ public class PCUtilUserRequestDto {
 
         List<String> date;
         int uid;
-        String user_name;
         String department_name;
     }
     @Getter
@@ -25,7 +24,7 @@ public class PCUtilUserRequestDto {
     public static class DailyPCRequest {
 
         String user_name;
-        String date;
+        List<String> date;
     }
 
 }

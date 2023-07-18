@@ -56,9 +56,12 @@ public class PCUtilController {
         return ResponseEntity.ok(result);
     }
 
-    @GetMapping("/DailyPC")
-    public ResponseEntity<?> GetDailyPC(PCUtilUserRequestDto.DailyPCRequest req){
+    @PostMapping("/DailyPC")
+    public ResponseEntity<?> GetDailyPC(@RequestBody @Validated PCUtilUserRequestDto.DailyPCRequest req, Errors errors){
 
+        if(errors.hasErrors()) {
+            return response.invalidFields(Helper.refineErrors(errors));
+        }
         JSONObject final_result = new JSONObject();
         List<List<String>> dailyPCUitl = pc_Util_userService.getDailyPCUitl(req.getUser_name(), req.getDate());
         final_result.put("inactive_time", dailyPCUitl);

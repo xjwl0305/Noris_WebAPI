@@ -8,10 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -77,8 +75,17 @@ public class PC_Util_UserService {
 
         return new UserDetailDataDto(user_name, avg_data, (float) work_time/3600, (float)(work_time-not_work_time)/3600);
     }
-    public List<List<String>> getDailyPCUitl(String user_name, String date){
-        List<TeamLogDataDto> log_data = PCUtilUserRepository.getUserLog(user_name, date);
+    public List<List<String>> getDailyPCUitl(String user_name, List<String> date){
+
+        List<TeamLogDataDto> log_data = new ArrayList<>();
+
+        if(date.size() > 1){
+            log_data = PCUtilUserRepository.getUserLogDate(user_name, date.get(0), date.get(1));
+        }else{
+            log_data = PCUtilUserRepository.getUserLog(user_name, date.get(0));
+        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        //Map<Object, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(item -> dateFormat.format(item.getLog_time())));
         String inactive_start = "";
         String inactive_end = "";
         boolean inactive_status = false;
