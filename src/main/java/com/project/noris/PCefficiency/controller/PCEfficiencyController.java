@@ -42,7 +42,7 @@ public class PCEfficiencyController {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         JSONObject final_result = new JSONObject();
-        List<Eff_TeamDataDto.final_data> effData = effDefaultService.getEffData(req.getDate(), req.getDepartment_name(), req.getCompany_name());
+        Eff_TeamDataDto.final_data effData = effDefaultService.getEffData(req.getDate(), req.getDepartment_name(), req.getCompany_name());
         final_result.put("team_data", effData);
         return ResponseEntity.ok(final_result);
         //return response.success(defaultService.getOrganization(req.getCompany()));

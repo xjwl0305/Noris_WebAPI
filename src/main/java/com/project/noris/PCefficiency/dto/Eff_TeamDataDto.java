@@ -19,9 +19,8 @@ public class Eff_TeamDataDto {
     @Setter
     @JsonAutoDetect
     public static class final_data {
-        String department_name;
-        List<minimum_data> program_eff;
-        long efficiency_percent;
+        Eff_UserDataDto.Team_data root_department;
+        List<Eff_UserDataDto.Team_data> leaf_department;
     }
     @Getter
     @Setter
@@ -30,6 +29,13 @@ public class Eff_TeamDataDto {
         double program_percent;
         double program_eff_time;
         String process_name;
+    }
+    @Getter
+    @Setter
+    @JsonAutoDetect
+    public static class Team_data {
+        String department_name;
+        double efficiency_percent;
     }
 
 }

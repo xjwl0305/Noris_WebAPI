@@ -125,7 +125,7 @@ public class Eff_UserService {
         return final_usage_status_data;
     }
 
-    Eff_UserDataDto.final_data getUserEffData(List<TeamLogDataDto> log_data, List<String> process_contain, String department_name){
+    public static Eff_UserDataDto.final_data getUserEffData(List<TeamLogDataDto> log_data, List<String> process_contain, String department_name){
         Map<Long, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(TeamLogDataDto::getUser_id));
         List<Float> teamData = new ArrayList<>();
         List<Eff_UserDataDto.User_data> users_data = new ArrayList<>();
