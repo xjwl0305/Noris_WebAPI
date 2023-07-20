@@ -67,17 +67,20 @@ private final PC_Util_TeamRepository PCUtilTeamRepository;
             count += 1;
             int a = 0;
         }
-        DoubleSummaryStatistics statistics = team_eff_percent_list
-                .stream()
-                .mapToDouble(num -> num)
-                .summaryStatistics();
-        final_data.setLeaf_department(list_data);
-        Eff_UserDataDto.Team_data token = final_data.getRoot_department();
-        if (token == null){
-            token = new Eff_UserDataDto.Team_data();
+        if(list_data.size() > 0) {
+            DoubleSummaryStatistics statistics = team_eff_percent_list
+                    .stream()
+                    .mapToDouble(num -> num)
+                    .summaryStatistics();
+            final_data.setLeaf_department(list_data);
+            Eff_UserDataDto.Team_data token = final_data.getRoot_department();
+            if (token == null) {
+                token = new Eff_UserDataDto.Team_data();
+            }
+            token.setEfficiency_percent(statistics.getAverage());
+
+            final_data.setRoot_department(token);
         }
-        token.setEfficiency_percent(statistics.getAverage());
-        final_data.setRoot_department(token);
         return final_data;
     }
 
