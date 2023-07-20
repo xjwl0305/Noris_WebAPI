@@ -84,42 +84,57 @@ private final PC_Util_TeamRepository PCUtilTeamRepository;
         return final_data;
     }
 
-//    public Eff_UserDataDto.Final_Usage_status_data getTeamUsageStatus(String department_name, List<String> date, String company_name){
-//        List<TeamLogDataDto> log_data = new ArrayList<>();
-//        Eff_UserDataDto.Final_Usage_status_data final_data = new Eff_UserDataDto.Final_Usage_status_data();
-//        Organization departments = PCUtilTeamRepository.getDepartments(department_name, company_name);
-//        Eff_TeamDataDto.final_usage_data final_usage_data = new Eff_TeamDataDto.final_usage_data();
-//        List<TeaminfoDto> data = PCUtilTeamRepository.getTeamData(departments.getId());
-//        for (TeaminfoDto datum : data) {
-//            if (date.size() > 1){
-//                log_data = PCUtilTeamRepository.getTeamLogDataDate(datum.getName(), date.get(0), date.get(1));
-//                final_data = getUserUsageStatusData(log_data, department_name);
-//            }else{
-//                log_data = PCUtilTeamRepository.getTeamLogData(datum.getName(), date.get(0));
-//                final_data = getUserUsageStatusData(log_data, department_name);
-//            }
-//            String standard = "";
-//
-//            for (TeamLogDataDto log_datum : log_data) {
-//                if (Objects.equals(standard, "") && !Objects.equals(data.getProcess_name(), "Unknown")) {
-//                    standard = data.getProcess_name();
-//                    standard_start = data.getLog_time();
-//                }
-//                if (!Objects.equals(standard, data.getProcess_name()) && !Objects.equals(data.getProcess_name(), "Unknown")) {
-//                    if (!process_list.contains(standard)) {
-//                        process_list.add(standard);
-//                        process_time_list.add((data.getLog_time().getTime() - standard_start.getTime()) / 1000); // 초단위
-//                    } else {
-//                        int find_index = process_list.indexOf(standard);
-//                        process_time_list.set(find_index, process_time_list.get(find_index) + (data.getLog_time().getTime() - standard_start.getTime()) / 1000);
-//                    }
-//                    standard = data.getProcess_name();
-//                    standard_start = data.getLog_time();
-//                }
-//            }
-//        }
-//
-//        return final_data;
-//    }
+    public Eff_TeamDataDto.final_usage_data getTeamUsageStatus(String department_name, List<String> date, String company_name){
+        List<TeamLogDataDto> log_data = new ArrayList<>();
+        Eff_UserDataDto.Final_Usage_status_data final_data = new Eff_UserDataDto.Final_Usage_status_data();
+        Organization departments = PCUtilTeamRepository.getDepartments(department_name, company_name);
+        Eff_TeamDataDto.final_usage_data final_usage_data = new Eff_TeamDataDto.final_usage_data();
+        List<TeaminfoDto> data = PCUtilTeamRepository.getTeamData(departments.getId());
+        List<String> process_list = new ArrayList<>();
+        List<Long> process_time_list = new ArrayList<>();
+        List<Map<String, Double>> department_usage_mapList = new ArrayList<>();
+        for (TeaminfoDto datum : data) {
+            if (date.size() > 1){
+                log_data = PCUtilTeamRepository.getTeamLogDataDate(datum.getName(), date.get(0), date.get(1));
+                //final_data = getUserUsageStatusData(log_data, department_name);
+            }else{
+                log_data = PCUtilTeamRepository.getTeamLogData(datum.getName(), date.get(0));
+                //final_data = getUserUsageStatusData(log_data, department_name);
+            }
+            String standard = "";
+            Date standard_start = new Date();
+            for (TeamLogDataDto log_datum : log_data) {
+                if (Objects.equals(standard, "") && !Objects.equals(log_datum.getProcess_name(), "Unknown")) {
+                    standard = log_datum.getProcess_name();
+                    standard_start = log_datum.getLog_time();
+                }
+                if (!Objects.equals(standard, log_datum.getProcess_name()) && !Objects.equals(log_datum.getProcess_name(), "Unknown")) {
+                    if (!process_list.contains(standard)) {
+                        process_list.add(standard);
+                        process_time_list.add((log_datum.getLog_time().getTime() - standard_start.getTime()) / 1000); // 초단위
+                    } else {
+                        int find_index = process_list.indexOf(standard);
+                        process_time_list.set(find_index, process_time_list.get(find_index) + (log_datum.getLog_time().getTime() - standard_start.getTime()) / 1000);
+                    }
+                    standard = log_datum.getProcess_name();
+                    standard_start = log_datum.getLog_time();
+                }
+            }
+        }
+        int count = 0;
+        List<Double> department_process_percent_list = new ArrayList<>();
+        for (String process : process_list) {
+            Map<String, Double> objects = new HashMap<>();
+            department_process_percent_list.add(Math.round(process_time_list.get(count)/process_time_list.stream().mapToDouble(a -> a).sum() * 100 * 10)/10.0);
+            objects.put(process_list.get(count), department_process_percent_list.get(count));
+            department_usage_mapList.add(objects);
+            count += 1;
+        }
+
+        final_usage_data.setProgram_percent(department_usage_mapList);
+        final_usage_data.setDepartment_name(department_name);
+        final_usage_data.setProgram_usage_time(process_time_list);
+        return final_usage_data;
+    }
 }
 
