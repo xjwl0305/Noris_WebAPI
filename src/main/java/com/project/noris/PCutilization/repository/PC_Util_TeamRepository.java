@@ -49,10 +49,10 @@ public interface PC_Util_TeamRepository extends JpaRepository<Organization, Long
 
     // 팀 인원 로그데이터 조회
     @Query(value ="select u.name as user_name, log_data.log_time, log_data.process_name, log_data.process_title, log_data.status, log_data.action, log_data.user_id " +
-            "from log_data left join user u on u.id = log_data.user_id left join department d on u.department_id = d.id where d.name = :department_name and DATE_FORMAT(log_data.log_time, '%Y-%m-%d') = :date", nativeQuery = true)
+            "from log_data left join user u on u.id = log_data.user_id left join department d on u.department_id = d.id where d.name = :department_name and DATE_FORMAT(log_data.log_time, '%Y-%m-%d') = :date and log_data.status not in ('Start', 'Exit')", nativeQuery = true)
     List<TeamLogDataDto> getTeamLogData(@Param("department_name") String department_name, @Param("date") String date);
     @Query(value ="select u.name as user_name, log_data.log_time, log_data.process_name, log_data.process_title, log_data.status, log_data.action, log_data.user_id " +
-            "from log_data left join user u on u.id = log_data.user_id left join department d on u.department_id = d.id where d.name = :department_name and log_data.log_time BETWEEN :date AND :date2", nativeQuery = true)
+            "from log_data left join user u on u.id = log_data.user_id left join department d on u.department_id = d.id where d.name = :department_name and log_data.log_time BETWEEN :date AND :date2 and log_data.status not in ('Start', 'Exit')", nativeQuery = true)
     List<TeamLogDataDto> getTeamLogDataDate(@Param("department_name") String department_name, @Param("date") String date, @Param("date2") String date2);
 
 

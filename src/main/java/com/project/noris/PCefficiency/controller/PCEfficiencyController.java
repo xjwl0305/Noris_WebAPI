@@ -56,7 +56,20 @@ public class PCEfficiencyController {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         JSONObject final_result = new JSONObject();
-        Eff_UserDataDto.final_data result = effSuperUserService.getEffData(req.getUid(), req.getDepartment_name(), req.getDate());
+        Eff_UserDataDto.final_data result = effSuperUserService.getEffData(req.getDepartment_name(), req.getDate());
+        return ResponseEntity.ok(result);
+        //return response.success(defaultService.getOrganization(req.getCompany()));
+    }
+
+    @PostMapping("/current_use")
+    public ResponseEntity<?> USEPage(@RequestBody @Validated Eff_UserRequestDto req, Errors errors) throws IOException {
+        // validation check
+
+        if (errors.hasErrors()) {
+            return response.invalidFields(Helper.refineErrors(errors));
+        }
+        JSONObject final_result = new JSONObject();
+        Eff_UserDataDto.Final_Usage_status_data result = effSuperUserService.getUsageStatus(req.getDepartment_name(), req.getDate());
         return ResponseEntity.ok(result);
         //return response.success(defaultService.getOrganization(req.getCompany()));
     }

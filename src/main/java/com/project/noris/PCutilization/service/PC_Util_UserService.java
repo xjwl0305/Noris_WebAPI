@@ -75,7 +75,7 @@ public class PC_Util_UserService {
 
         return new UserDetailDataDto(user_name, avg_data, (float) work_time/3600, (float)(work_time-not_work_time)/3600);
     }
-    public List<List<String>> getDailyPCUitl(String user_name, List<String> date){
+    public List<List<String>> getDailyPCUtil(String user_name, List<String> date){
 
         List<TeamLogDataDto> log_data = new ArrayList<>();
 

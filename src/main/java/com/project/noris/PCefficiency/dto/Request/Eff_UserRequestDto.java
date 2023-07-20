@@ -21,4 +21,5 @@ public class Eff_UserRequestDto {
     private String department_name;
 
     private List<String> date;
+
 }

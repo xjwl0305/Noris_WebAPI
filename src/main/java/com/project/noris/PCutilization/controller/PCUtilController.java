@@ -63,7 +63,7 @@ public class PCUtilController {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         JSONObject final_result = new JSONObject();
-        List<List<String>> dailyPCUitl = pc_Util_userService.getDailyPCUitl(req.getUser_name(), req.getDate());
+        List<List<String>> dailyPCUitl = pc_Util_userService.getDailyPCUtil(req.getUser_name(), req.getDate());
         final_result.put("inactive_time", dailyPCUitl);
         return ResponseEntity.ok(final_result);
     }
