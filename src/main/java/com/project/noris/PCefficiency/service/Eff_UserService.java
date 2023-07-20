@@ -51,7 +51,7 @@ public class Eff_UserService {
         return final_data;
     }
 
-    Eff_UserDataDto.Final_Usage_status_data getUserUsageStatusData(List<TeamLogDataDto> log_data, String department_name){
+    public static Eff_UserDataDto.Final_Usage_status_data getUserUsageStatusData(List<TeamLogDataDto> log_data, String department_name){
         Map<Long, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(TeamLogDataDto::getUser_id));
         Date standard_start = new Date();
         List<String> department_process_list = new ArrayList<>();

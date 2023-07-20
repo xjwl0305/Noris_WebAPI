@@ -37,5 +37,13 @@ public class Eff_TeamDataDto {
         String department_name;
         double efficiency_percent;
     }
+    @Getter
+    @Setter
+    @JsonAutoDetect
+    public static class final_usage_data {
+        String department_name;
+        List<Map<String, Double>>  program_percent;
+        List<Long> program_usage_time;
+    }
 
 }
