@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 
 import static com.project.noris.PCefficiency.service.Eff_UserService.getUserEffData;
@@ -26,7 +27,7 @@ public class Eff_TeamService {
 private final PC_Util_TeamRepository PCUtilTeamRepository;
     private final S3Service s3Service;
 
-    public  Eff_TeamDataDto.final_data getEffData(List<String> date, String department_name, String company_name) throws IOException {
+    public  Eff_TeamDataDto.final_data getEffData(List<String> date, String department_name, String company_name) throws IOException, ParseException {
         List<String> process_list = s3Service.readObject("process_list/process_list.csv");
         Organization departments = PCUtilTeamRepository.getDepartments(department_name, company_name);
         List<TeaminfoDto> data = PCUtilTeamRepository.getTeamData(departments.getId());

@@ -17,6 +17,7 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 @Slf4j
@@ -32,7 +33,7 @@ public class PCUtilController {
     private final Response response;
 
     @PostMapping("/team")
-    public ResponseEntity<?> DefaultPage(@RequestBody @Validated PCUtilTeamRequestDto.TeamData req, Errors errors) {
+    public ResponseEntity<?> DefaultPage(@RequestBody @Validated PCUtilTeamRequestDto.TeamData req, Errors errors) throws ParseException {
         // validation check
 
         if (errors.hasErrors()) {
@@ -47,7 +48,7 @@ public class PCUtilController {
     }
 
     @PostMapping("/per")
-    public ResponseEntity<?> GetPersonData(@RequestBody @Validated PCUtilUserRequestDto.UserRequest req, Errors errors){
+    public ResponseEntity<?> GetPersonData(@RequestBody @Validated PCUtilUserRequestDto.UserRequest req, Errors errors) throws ParseException {
 
         if(errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));

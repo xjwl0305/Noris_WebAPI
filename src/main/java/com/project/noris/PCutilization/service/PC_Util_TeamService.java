@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,7 +32,7 @@ public class PC_Util_TeamService {
         return all.stream().map(OrganizationDto::new).collect(Collectors.toList());
     }
 
-    public List<TeamdataDto> getTimeData(int uid, List<String> date, String department_name, String company_name){
+    public List<TeamdataDto> getTimeData(int uid, List<String> date, String department_name, String company_name) throws ParseException {
         ArrayList<TeamdataDto> list_data = new ArrayList<>();
         Organization departments = PCUtilTeamRepository.getDepartments(department_name, company_name);
         List<TeaminfoDto> data = PCUtilTeamRepository.getTeamData(departments.getId());
@@ -57,7 +59,7 @@ public class PC_Util_TeamService {
         return list_data;
     }
 
-    TeamdataDto getTeamData(List<TeamLogDataDto> log_data, String department_name){
+    TeamdataDto getTeamData(List<TeamLogDataDto> log_data, String department_name) throws ParseException {
         Map<Long, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(TeamLogDataDto::getUser_id));
         List<Float> teamData = new ArrayList<>();
 
@@ -65,14 +67,17 @@ public class PC_Util_TeamService {
             List<TeamLogDataDto> teamLogDataDtos = valid.get(aLong);
             Long start_time = teamLogDataDtos.get(0).getLog_time().getTime();
             Long end_time = teamLogDataDtos.get(teamLogDataDtos.size() -1).getLog_time().getTime();
-            int count = 0;
+            long not_work_time = 0;
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             for (TeamLogDataDto teamLogDataDto : teamLogDataDtos) {
                 if(Objects.equals(teamLogDataDto.getStatus(), "inactive")){
-                    count+=1;
+                    String[] split = teamLogDataDto.getAction().split(", ");
+                    Date date1 = formatter.parse(split[0]);
+                    Date date2 = formatter.parse(split[1]);
+                    not_work_time += (date2.getTime() - date1.getTime())/1000;
                 }
             }
             long work_time = (end_time - start_time)/1000;
-            long not_work_time = count * 600L;
             String a = "we";
             teamData.add((float) ((work_time-not_work_time)* 100)/work_time);
         }

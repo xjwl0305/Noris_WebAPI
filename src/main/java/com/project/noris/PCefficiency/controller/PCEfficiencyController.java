@@ -19,6 +19,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -35,7 +36,7 @@ public class PCEfficiencyController {
     private final Eff_UserService effSuperUserService;
 
     @PostMapping("/team")
-    public ResponseEntity<?> DefaultPage(@RequestBody @Validated Eff_TeamRequestDto req, Errors errors) throws IOException {
+    public ResponseEntity<?> DefaultPage(@RequestBody @Validated Eff_TeamRequestDto req, Errors errors) throws IOException, ParseException {
         // validation check
 
         if (errors.hasErrors()) {
@@ -49,7 +50,7 @@ public class PCEfficiencyController {
     }
 
     @PostMapping("/user")
-    public ResponseEntity<?> UserPage(@RequestBody @Validated Eff_UserRequestDto req, Errors errors) throws IOException {
+    public ResponseEntity<?> UserPage(@RequestBody @Validated Eff_UserRequestDto req, Errors errors) throws IOException, ParseException {
         // validation check
 
         if (errors.hasErrors()) {

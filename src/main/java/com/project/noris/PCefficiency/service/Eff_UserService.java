@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,7 +24,7 @@ public class Eff_UserService {
     private final PC_Util_TeamRepository PCUtilTeamRepository;
 //    private final PCEfficiencyRepository pcEfficiencyRepository;
     private final Eff_TeamService effDefaultService;
-    public  Eff_UserDataDto.final_data getEffData(String department_name, List<String> date) throws IOException {
+    public  Eff_UserDataDto.final_data getEffData(String department_name, List<String> date) throws IOException, ParseException {
         List<String> process_list = s3Service.readObject("process_list/process_list.csv");
         List<TeamLogDataDto> log_data = new ArrayList<>();
         Eff_UserDataDto.final_data final_data = new Eff_UserDataDto.final_data();
@@ -125,7 +126,7 @@ public class Eff_UserService {
         return final_usage_status_data;
     }
 
-    public static Eff_UserDataDto.final_data getUserEffData(List<TeamLogDataDto> log_data, List<String> process_contain, String department_name){
+    public static Eff_UserDataDto.final_data getUserEffData(List<TeamLogDataDto> log_data, List<String> process_contain, String department_name) throws ParseException {
         Map<Long, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(TeamLogDataDto::getUser_id));
         List<Float> teamData = new ArrayList<>();
         List<Eff_UserDataDto.User_data> users_data = new ArrayList<>();
@@ -143,7 +144,8 @@ public class Eff_UserService {
 
             Long end_time = valid.get(aLong).get(valid.get(aLong).size() -1).getLog_time().getTime();
             Long total_log_time = end_time - start_time;
-
+            long not_work_time = 0;
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             List<TeamLogDataDto> teamLogDataDtos = valid.get(aLong);
             for(TeamLogDataDto data : teamLogDataDtos){
                 if(!process_contain.contains(data.getProcess_name())){
@@ -156,12 +158,15 @@ public class Eff_UserService {
                 }
 
                 if(Objects.equals(data.getStatus(), "inactive")){
-                    count+=1;
+                    String[] split = data.getAction().split(", ");
+                    Date date1 = formatter.parse(split[0]);
+                    Date date2 = formatter.parse(split[1]);
+                    not_work_time += (date2.getTime() - date1.getTime())/1000;
                 }
             }
             total_log_time /= 1000;
             none_work_log_time = Math.abs(none_work_log_time) / 1000;
-            long work_time = total_log_time - (count * 600L);
+            long work_time = total_log_time - (not_work_time);
             double pc_efficient_percent = 100 -  ((double)none_work_log_time / (double)work_time)*100;
             Eff_UserDataDto.User_data user_data = new Eff_UserDataDto.User_data();
             user_data.setUser_name(valid.get(aLong).get(0).getUser_name());
