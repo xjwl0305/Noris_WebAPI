@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -64,7 +65,7 @@ public class PCUtilController {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         JSONObject final_result = new JSONObject();
-        List<List<String>> dailyPCUitl = pc_Util_userService.getDailyPCUtil(req.getUser_name(), req.getDate());
+        Map<String, List<List<String>>> dailyPCUitl = pc_Util_userService.getDailyPCUtil(req.getUser_name(), req.getDate());
         final_result.put("inactive_time", dailyPCUitl);
         return ResponseEntity.ok(final_result);
     }

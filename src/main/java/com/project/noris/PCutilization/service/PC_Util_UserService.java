@@ -78,7 +78,7 @@ public class PC_Util_UserService {
 
         return new UserDetailDataDto(user_name, avg_data, (float) work_time/3600, (float)(work_time-not_work_time)/3600);
     }
-    public List<List<String>> getDailyPCUtil(String user_name, List<String> date){
+    public Map<String, List<List<String>>> getDailyPCUtil(String user_name, List<String> date){
 
         List<TeamLogDataDto> log_data = new ArrayList<>();
 
@@ -89,35 +89,42 @@ public class PC_Util_UserService {
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Map<String, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(item -> dateFormat.format(item.getLog_time())));
-        List<List<String>> total_time = new ArrayList<>();
-
-        int count = 0;
+        Map<String, List<List<String>>> total_time = new HashMap<>();
         List<String> dup_time = new ArrayList<>();
         for (String o : valid.keySet()) {
             String[] s = valid.get(o).get(0).getLog_time().toString().split(" ");
             dup_time.add(s[0] + " 00:00:00");
         }
-        for (TeamLogDataDto LogDataDto : log_data) {
-            if(Objects.equals(LogDataDto.getStatus(), "inactive")){
-                String[] split = LogDataDto.getAction().split(", ");
-                List<String> inactive_time = new ArrayList<>();
-                String[] s = split[0].split(" ");
-                if (dup_time.contains(split[0])){
-                    continue;
+        for (String aLong : valid.keySet()) {
+            List<TeamLogDataDto> teamLogDataDtos = valid.get(aLong);
+            List<List<String>> per_date_log = new ArrayList<>();
+            for (TeamLogDataDto teamLogDataDto : teamLogDataDtos) {
+                if(Objects.equals(teamLogDataDto.getStatus(), "inactive")){
+                    String[] split = teamLogDataDto.getAction().split(", ");
+                    List<String> inactive_time = new ArrayList<>();
+                    String[] s = split[0].split(" ");
+                    if (dup_time.contains(split[0])){
+                        continue;
+                    }
+                    if(!split[0].split(" ")[0].equals(teamLogDataDto.getLog_time().toString().split(" ")[0]) || !Objects.equals(split[1].split(" ")[0], teamLogDataDto.getLog_time().toString().split(" ")[0])){
+                        continue;
+                    }
+                    inactive_time.add(split[0]);
+                    inactive_time.add(split[1]);
+                    per_date_log.add(inactive_time);
                 }
-                inactive_time.add(split[0]);
-                inactive_time.add(split[1]);
-                total_time.add(inactive_time);
             }
-        }
-        for (String o : valid.keySet()) {
             List<String> start_time = new ArrayList<>();
-            String[] s = valid.get(o).get(0).getLog_time().toString().split(" ");
+            String[] s = valid.get(aLong).get(0).getLog_time().toString().split(" ");
             start_time.add(s[0] + " 00:00:00");
-            start_time.add(valid.get(o).get(0).getLog_time().toString().split("\\.")[0]);
-            total_time.add(start_time);
+            start_time.add(valid.get(aLong).get(0).getLog_time().toString().split("\\.")[0]);
+            per_date_log.add(0, start_time);
+            Map<String, List<List<String>>> token = new HashMap<>();
+//            token.put(s[0], per_date_log);
+            total_time.put(s[0], per_date_log);
         }
-
+        Object[] mapkey = total_time.keySet().toArray();
+        Arrays.sort(mapkey);
         return total_time;
     }
 }

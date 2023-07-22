@@ -13,4 +13,6 @@ public interface UserInfoDto {
     String getDepartment_name();
     String getCompany_name();
 
+    String getImage();
+    String getUser_name();
 }
