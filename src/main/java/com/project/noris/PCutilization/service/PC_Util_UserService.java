@@ -123,8 +123,8 @@ public class PC_Util_UserService {
 //            token.put(s[0], per_date_log);
             total_time.put(s[0], per_date_log);
         }
-        Object[] mapkey = total_time.keySet().toArray();
-        Arrays.sort(mapkey);
-        return total_time;
+        Map<String, List<List<String>>> sortedMap = new TreeMap<>(total_time);
+
+        return sortedMap;
     }
 }
