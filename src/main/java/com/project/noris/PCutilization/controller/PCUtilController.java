@@ -59,7 +59,7 @@ public class PCUtilController {
     }
 
     @PostMapping("/DailyPC")
-    public ResponseEntity<?> GetDailyPC(@RequestBody @Validated PCUtilUserRequestDto.DailyPCRequest req, Errors errors){
+    public ResponseEntity<?> GetDailyPC(@RequestBody @Validated PCUtilUserRequestDto.DailyPCRequest req, Errors errors) throws ParseException {
 
         if(errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));

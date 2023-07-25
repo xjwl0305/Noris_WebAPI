@@ -78,7 +78,7 @@ public class PC_Util_UserService {
 
         return new UserDetailDataDto(user_name, avg_data, (float) work_time/3600, (float)(work_time-not_work_time)/3600);
     }
-    public Map<String, List<List<String>>> getDailyPCUtil(String user_name, List<String> date){
+    public Map<String, List<List<String>>> getDailyPCUtil(String user_name, List<String> date) throws ParseException {
 
         List<TeamLogDataDto> log_data = new ArrayList<>();
 
@@ -88,6 +88,7 @@ public class PC_Util_UserService {
             log_data = PCUtilUserRepository.getUserLog(user_name, date.get(0));
         }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Map<String, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(item -> dateFormat.format(item.getLog_time())));
         Map<String, List<List<String>>> total_time = new HashMap<>();
         List<String> dup_time = new ArrayList<>();
@@ -98,10 +99,13 @@ public class PC_Util_UserService {
         for (String aLong : valid.keySet()) {
             List<TeamLogDataDto> teamLogDataDtos = valid.get(aLong);
             List<List<String>> per_date_log = new ArrayList<>();
+            long incative_interval = 0;
+            List<String> end_inactive_time = new ArrayList<>();
+            List<String> start_inactive_time = new ArrayList<>();
             for (TeamLogDataDto teamLogDataDto : teamLogDataDtos) {
+                List<String> inactive_time = new ArrayList<>();
                 if(Objects.equals(teamLogDataDto.getStatus(), "inactive")){
                     String[] split = teamLogDataDto.getAction().split(", ");
-                    List<String> inactive_time = new ArrayList<>();
                     String[] s = split[0].split(" ");
                     if (dup_time.contains(split[0])){
                         continue;
@@ -111,9 +115,26 @@ public class PC_Util_UserService {
                     }
                     inactive_time.add(split[0]);
                     inactive_time.add(split[1]);
+                    incative_interval += formatter.parse(split[1]).getTime() - formatter.parse(split[0]).getTime();
                     per_date_log.add(inactive_time);
                 }
+                if (teamLogDataDto.getLog_time() == teamLogDataDtos.get(teamLogDataDtos.size() -1).getLog_time()) {
+                    end_inactive_time.add(teamLogDataDto.getLog_time().toString().split("\\.")[0]);
+                    String dateForm = teamLogDataDto.getLog_time().toString().split(" ")[0];
+                    //incative_interval += formatter.parse(dateForm + " 23:59:59").getTime() - formatter.parse(teamLogDataDto.getLog_time().toString()).getTime();
+                    end_inactive_time.add(dateForm+" 23:59:59");
+                    //per_date_log.add(inactive_time);
+                }
+                if (teamLogDataDto.getLog_time() == teamLogDataDtos.get(0).getLog_time()){
+                    String dateForm = teamLogDataDto.getLog_time().toString().split(" ")[0];
+                    start_inactive_time.add(dateForm + " 00:00:00");
+                    start_inactive_time.add(teamLogDataDto.getLog_time().toString().split("\\.")[0]);
+                }
             }
+
+//            if(!Objects.equals(per_date_log.get(0).get(0), teamLogDataDtos.get(0).getLog_time().toString().split(" ")[0] + " 00:00:00")){
+//                per_date_log
+//            }
             List<String> start_time = new ArrayList<>();
             String[] s = valid.get(aLong).get(0).getLog_time().toString().split(" ");
             start_time.add(s[0] + " 00:00:00");

@@ -38,6 +38,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/mypage/*").hasRole("USER")
                 .antMatchers("/pc_efficiency/*").hasRole("USER")
                 .antMatchers("/account/userinfo").hasRole("USER")
+                .antMatchers("/main/*").hasRole("USER")
                 .antMatchers("/account/adminTest").hasRole("ADMIN")
                 .and()
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, redisTemplate), UsernamePasswordAuthenticationFilter.class);
