@@ -3,6 +3,7 @@ package com.project.noris.PCutilization.controller;
 
 import com.project.noris.PCutilization.dto.Request.PCUtilTeamRequestDto;
 import com.project.noris.PCutilization.dto.Request.PCUtilUserRequestDto;
+import com.project.noris.PCutilization.dto.Response.UserResponseDto;
 import com.project.noris.PCutilization.dto.TeamdataDto;
 import com.project.noris.PCutilization.dto.UserDataDto;
 import com.project.noris.PCutilization.service.PC_Util_TeamService;
@@ -64,10 +65,8 @@ public class PCUtilController {
         if(errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));
         }
-        JSONObject final_result = new JSONObject();
-        Map<String, List<List<String>>> dailyPCUitl = pc_Util_userService.getDailyPCUtil(req.getUser_name(), req.getDate());
-        final_result.put("inactive_time", dailyPCUitl);
-        return ResponseEntity.ok(final_result);
+        UserResponseDto.DailyPCResponse dailyPCUitl = pc_Util_userService.getDailyPCUtil(req.getUser_name(), req.getDate());
+        return ResponseEntity.ok(dailyPCUitl);
     }
 
 }

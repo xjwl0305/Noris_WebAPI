@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -24,7 +25,8 @@ public class UserResponseDto {
     @Setter
     public static class DailyPCResponse {
 
-        List<String> inactive_time;
+        Map<String, List<List<String>>> inactive_time;
+        Map<String, Long> inactive_total_time;
     }
 
 }

@@ -2,6 +2,7 @@ package com.project.noris.PCutilization.service;
 
 import com.project.noris.PCutilization.dto.*;
 import com.project.noris.PCutilization.dto.Request.PCUtilUserRequestDto;
+import com.project.noris.PCutilization.dto.Response.UserResponseDto;
 import com.project.noris.PCutilization.repository.PC_Util_TeamRepository;
 import com.project.noris.PCutilization.repository.PC_Util_UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,20 @@ public class PC_Util_UserService {
             UserDetailDataDto person = getUserDetail(Math.toIntExact(users.getId()), users.getName(), req.getDate());
             List_UserDetail.add(person);
         }
-
+        List<Double> total_time = new ArrayList<>();
+        List<Double> work_time = new ArrayList<>();
+        for (UserDetailDataDto userDetailDataDto : List_UserDetail) {
+            total_time.add(userDetailDataDto.getTotal_time());
+            work_time.add(userDetailDataDto.getWork_time());
+        }
+        double total_avg_data = total_time.stream()
+                .mapToDouble(a -> a)
+                .average().orElse(0);
+        double work_avg_data = work_time.stream()
+                .mapToDouble(a -> a)
+                .average().orElse(0);
+        team.setTotal_time(total_avg_data);
+        team.setWork_time(work_avg_data);
         return new UserDataDto(team, List_UserDetail);
     }
 
@@ -78,7 +92,7 @@ public class PC_Util_UserService {
 
         return new UserDetailDataDto(user_name, avg_data, (float) work_time/3600, (float)(work_time-not_work_time)/3600);
     }
-    public Map<String, List<List<String>>> getDailyPCUtil(String user_name, List<String> date) throws ParseException {
+    public UserResponseDto.DailyPCResponse getDailyPCUtil(String user_name, List<String> date) throws ParseException {
 
         List<TeamLogDataDto> log_data = new ArrayList<>();
 
@@ -92,6 +106,7 @@ public class PC_Util_UserService {
         Map<String, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(item -> dateFormat.format(item.getLog_time())));
         Map<String, List<List<String>>> total_time = new HashMap<>();
         List<String> dup_time = new ArrayList<>();
+        Map<String, Long> inactive_total_time = new HashMap<>();
         for (String o : valid.keySet()) {
             String[] s = valid.get(o).get(0).getLog_time().toString().split(" ");
             dup_time.add(s[0] + " 00:00:00");
@@ -100,6 +115,7 @@ public class PC_Util_UserService {
             List<TeamLogDataDto> teamLogDataDtos = valid.get(aLong);
             List<List<String>> per_date_log = new ArrayList<>();
             long incative_interval = 0;
+            Map<String, Long> pair_inactive = new HashMap<>();
             List<String> end_inactive_time = new ArrayList<>();
             List<String> start_inactive_time = new ArrayList<>();
             for (TeamLogDataDto teamLogDataDto : teamLogDataDtos) {
@@ -118,17 +134,19 @@ public class PC_Util_UserService {
                     incative_interval += formatter.parse(split[1]).getTime() - formatter.parse(split[0]).getTime();
                     per_date_log.add(inactive_time);
                 }
-                if (teamLogDataDto.getLog_time() == teamLogDataDtos.get(teamLogDataDtos.size() -1).getLog_time()) {
+                if (teamLogDataDto.getLog_time() == teamLogDataDtos.get(teamLogDataDtos.size() -1).getLog_time() && !Objects.equals(teamLogDataDto.getStatus(), "inactive")) {
                     end_inactive_time.add(teamLogDataDto.getLog_time().toString().split("\\.")[0]);
                     String dateForm = teamLogDataDto.getLog_time().toString().split(" ")[0];
-                    //incative_interval += formatter.parse(dateForm + " 23:59:59").getTime() - formatter.parse(teamLogDataDto.getLog_time().toString()).getTime();
+                    incative_interval += formatter.parse(dateForm + " 23:59:59").getTime() - formatter.parse(teamLogDataDto.getLog_time().toString()).getTime();
                     end_inactive_time.add(dateForm+" 23:59:59");
-                    //per_date_log.add(inactive_time);
+                    per_date_log.add(end_inactive_time);
                 }
-                if (teamLogDataDto.getLog_time() == teamLogDataDtos.get(0).getLog_time()){
+                if (teamLogDataDto.getLog_time() == teamLogDataDtos.get(0).getLog_time() && !Objects.equals(teamLogDataDto.getStatus(), "inactive")){
                     String dateForm = teamLogDataDto.getLog_time().toString().split(" ")[0];
+                    incative_interval += formatter.parse(teamLogDataDto.getLog_time().toString()).getTime() - formatter.parse(dateForm + " 00:00:00").getTime();
                     start_inactive_time.add(dateForm + " 00:00:00");
                     start_inactive_time.add(teamLogDataDto.getLog_time().toString().split("\\.")[0]);
+                    per_date_log.add(0, start_inactive_time);
                 }
             }
 
@@ -137,15 +155,22 @@ public class PC_Util_UserService {
 //            }
             List<String> start_time = new ArrayList<>();
             String[] s = valid.get(aLong).get(0).getLog_time().toString().split(" ");
-            start_time.add(s[0] + " 00:00:00");
-            start_time.add(valid.get(aLong).get(0).getLog_time().toString().split("\\.")[0]);
-            per_date_log.add(0, start_time);
+//            start_time.add(s[0] + " 00:00:00");
+//            start_time.add(valid.get(aLong).get(0).getLog_time().toString().split("\\.")[0]);
+//            per_date_log.add(0, start_time);
             Map<String, List<List<String>>> token = new HashMap<>();
 //            token.put(s[0], per_date_log);
+            incative_interval /= 60000;
+
+//            pair_inactive.put(s[0], incative_interval);
+            inactive_total_time.put(s[0], incative_interval);
             total_time.put(s[0], per_date_log);
         }
         Map<String, List<List<String>>> sortedMap = new TreeMap<>(total_time);
-
-        return sortedMap;
+        Map<String, Long> sortedMap2 = new TreeMap<>(inactive_total_time);
+        UserResponseDto.DailyPCResponse dailyPCResponse = new UserResponseDto.DailyPCResponse();
+        dailyPCResponse.setInactive_time(sortedMap);
+        dailyPCResponse.setInactive_total_time(sortedMap2);
+        return dailyPCResponse;
     }
 }

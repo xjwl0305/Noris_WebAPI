@@ -62,7 +62,6 @@ public class PC_Util_TeamService {
     TeamdataDto getTeamData(List<TeamLogDataDto> log_data, String department_name) throws ParseException {
         Map<Long, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(TeamLogDataDto::getUser_id));
         List<Float> teamData = new ArrayList<>();
-
         for (Long aLong : valid.keySet()) {
             List<TeamLogDataDto> teamLogDataDtos = valid.get(aLong);
             Long start_time = teamLogDataDtos.get(0).getLog_time().getTime();
@@ -80,10 +79,12 @@ public class PC_Util_TeamService {
             long work_time = (end_time - start_time)/1000;
             String a = "we";
             teamData.add((float) ((work_time-not_work_time)* 100)/work_time);
+
         }
         double avg_data = teamData.stream()
                 .mapToDouble(a -> a)
                 .average().orElse(0);
+
         return new TeamdataDto(department_name, avg_data,40, 20);
     }
 

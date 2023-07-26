@@ -18,8 +18,8 @@ public class TeamdataDto {
 
     private double percent;
 
-    private int total_time;
+    private double total_time;
 
-    private int work_time;
+    private double work_time;
 
 }
