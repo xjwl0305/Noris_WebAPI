@@ -42,6 +42,7 @@ public class PC_Util_UserService {
         for (UserDetailDataDto userDetailDataDto : List_UserDetail) {
             total_time.add(userDetailDataDto.getTotal_time());
             work_time.add(userDetailDataDto.getWork_time());
+
         }
         double total_avg_data = total_time.stream()
                 .mapToDouble(a -> a)

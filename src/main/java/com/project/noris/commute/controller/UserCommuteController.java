@@ -50,8 +50,8 @@ public class UserCommuteController {
         }
 
         JSONObject final_result = new JSONObject();
-        CommuteDto.commute_final commute = commuteService.getCommute(req.getDate(), req.getDepartment_name(), req.getCompany_name());
-        return ResponseEntity.ok(commute);
+        CommuteDto.working_time_team workingTimeTeam = commuteService.getWorkingTimeTeam(req.getDate(), req.getDepartment_name(), req.getCompany_name());
+        return ResponseEntity.ok(workingTimeTeam);
     }
 
     @PostMapping("/working_time_user")
@@ -63,7 +63,7 @@ public class UserCommuteController {
         }
 
         JSONObject final_result = new JSONObject();
-        CommuteDto.commute_final commute = commuteService.getCommute(req.getDate(), req.getDepartment_name(), req.getCompany_name());
-        return ResponseEntity.ok(commute);
+        CommuteDto.working_time_user workingTime = commuteService.getWorkingTime(req.getDate(), req.getDepartment_name(), req.getCompany_name());
+        return ResponseEntity.ok(workingTime);
     }
 }
