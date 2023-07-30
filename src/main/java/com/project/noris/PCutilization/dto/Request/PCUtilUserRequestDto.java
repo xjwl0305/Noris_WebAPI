@@ -18,6 +18,7 @@ public class PCUtilUserRequestDto {
         List<String> date;
         int uid;
         String department_name;
+        String company_name;
     }
     @Getter
     @Setter

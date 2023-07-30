@@ -26,62 +26,75 @@ public class Eff_TeamService {
 
 private final PC_Util_TeamRepository PCUtilTeamRepository;
     private final S3Service s3Service;
+    private final Eff_UserService eff_userService;
 
     public  Eff_TeamDataDto.final_data getEffData(List<String> date, String department_name, String company_name) throws IOException, ParseException {
-        List<String> process_list = s3Service.readObject("process_list/process_list.csv");
+//        List<String> process_list = s3Service.readObject("process_list/process_list.csv");
         Organization departments = PCUtilTeamRepository.getDepartments(department_name, company_name);
         List<TeaminfoDto> data = PCUtilTeamRepository.getTeamData(departments.getId());
-        List<Eff_UserDataDto.Team_data> list_data = new ArrayList<>();
         Eff_TeamDataDto.final_data final_data = new Eff_TeamDataDto.final_data();
-        //List<TeamLogDataDto> log_data = new ArrayList<>();
+        List<Eff_UserDataDto.Team_data> list_data = new ArrayList<>();
         int count = 0;
-        List<Double> team_eff_percent_list = new ArrayList<>();
         for (TeaminfoDto datum : data) {
-            List<TeamLogDataDto> log_data = new ArrayList<>();
-            Eff_UserDataDto.Team_data teamData = new Eff_UserDataDto.Team_data();
-            if (date.size() > 1) {
-                log_data = PCUtilTeamRepository.getTeamLogDataDate(datum.getName(), date.get(0), date.get(1));
-            } else {
-                log_data = PCUtilTeamRepository.getTeamLogData(datum.getName(), date.get(0));
-            }
-            Eff_UserDataDto.final_data userEffData = getUserEffData(log_data, process_list, datum.getName());
-            if (log_data.size() == 0){
-                if(Objects.equals(department_name, datum.getName())){
-                    final_data.setRoot_department(userEffData.getTeam_data());
-                    continue;
-                }
-                teamData.setDepartment_name(datum.getName());
-                list_data.add(teamData);
-                team_eff_percent_list.add(teamData.getEfficiency_percent());
-                continue;
-            }
-//            teamData = getTeamData(log_data, process_list);
-//            teamData.setDepartment_name(datum.getName());
-//            list_data.add(teamData);
-
-            if (Objects.equals(department_name, datum.getName())){
-                final_data.setRoot_department(userEffData.getTeam_data());
+            Eff_UserDataDto.final_data effData = eff_userService.getEffData(datum.getName(), date, company_name);
+            if(count == 0) {
+                final_data.setRoot_department(effData.getTeam_data());
             }else{
-                list_data.add(userEffData.getTeam_data());
-                team_eff_percent_list.add(userEffData.getTeam_data().getEfficiency_percent());
+                list_data.add(effData.getTeam_data());
             }
-            count += 1;
-            int a = 0;
+            count++;
         }
-        if(list_data.size() > 0) {
-            DoubleSummaryStatistics statistics = team_eff_percent_list
-                    .stream()
-                    .mapToDouble(num -> num)
-                    .summaryStatistics();
-            final_data.setLeaf_department(list_data);
-            Eff_UserDataDto.Team_data token = final_data.getRoot_department();
-            if (token == null) {
-                token = new Eff_UserDataDto.Team_data();
-            }
-            token.setEfficiency_percent(statistics.getAverage());
+        final_data.setLeaf_department(list_data);
 
-            final_data.setRoot_department(token);
-        }
+        //List<TeamLogDataDto> log_data = new ArrayList<>();
+//        List<Double> team_eff_percent_list = new ArrayList<>();
+//        for (TeaminfoDto datum : data) {
+//            List<TeamLogDataDto> log_data = new ArrayList<>();
+//            Eff_UserDataDto.Team_data teamData = new Eff_UserDataDto.Team_data();
+//            if (date.size() > 1) {
+//                log_data = PCUtilTeamRepository.getTeamLogDataDate(datum.getName(), date.get(0), date.get(1));
+//            } else {
+//                log_data = PCUtilTeamRepository.getTeamLogData(datum.getName(), date.get(0));
+//            }
+//            Eff_UserDataDto.final_data userEffData = getUserEffData(log_data, process_list, datum.getName());
+//            if (log_data.size() == 0){
+//                if(Objects.equals(department_name, datum.getName())){
+//                    final_data.setRoot_department(userEffData.getTeam_data());
+//                    continue;
+//                }
+//                teamData.setDepartment_name(datum.getName());
+//                list_data.add(teamData);
+//                team_eff_percent_list.add(teamData.getEfficiency_percent());
+//                continue;
+//            }
+////            teamData = getTeamData(log_data, process_list);
+////            teamData.setDepartment_name(datum.getName());
+////            list_data.add(teamData);
+//
+//            if (Objects.equals(department_name, datum.getName())){
+//                final_data.setRoot_department(userEffData.getTeam_data());
+//            }else{
+//                list_data.add(userEffData.getTeam_data());
+//                team_eff_percent_list.add(userEffData.getTeam_data().getEfficiency_percent());
+//            }
+//            count += 1;
+//            int a = 0;
+//        }
+//        if(list_data.size() > 0) {
+//            DoubleSummaryStatistics statistics = team_eff_percent_list
+//                    .stream()
+//                    .mapToDouble(num -> num)
+//                    .summaryStatistics();
+//            final_data.setLeaf_department(list_data);
+//            Eff_UserDataDto.Team_data token = final_data.getRoot_department();
+//            if (token == null) {
+//                token = new Eff_UserDataDto.Team_data();
+//            }
+//            token.setEfficiency_percent(statistics.getAverage());
+//
+//            final_data.setRoot_department(token);
+//        }
+
         return final_data;
     }
 

@@ -17,4 +17,8 @@ public class UserDetailDataDto {
     private double percent;
     private double total_time;
     private double work_time;
+
+    public UserDetailDataDto() {
+
+    }
 }

@@ -5,8 +5,10 @@ import com.project.noris.PCutilization.dto.Request.PCUtilUserRequestDto;
 import com.project.noris.PCutilization.dto.Response.UserResponseDto;
 import com.project.noris.PCutilization.repository.PC_Util_TeamRepository;
 import com.project.noris.PCutilization.repository.PC_Util_UserRepository;
+import com.project.noris.entity.Organization;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -21,28 +23,25 @@ public class PC_Util_UserService {
 
     private final PC_Util_UserRepository PCUtilUserRepository;
     private final PC_Util_TeamRepository PCUtilTeamRepository;
-    private final PC_Util_TeamService PCUtilTeamService;
-    public UserDataDto getPersonData(PCUtilUserRequestDto.UserRequest req) throws ParseException {
-        List<TeamLogDataDto> log_data = new ArrayList<>();
-        if(req.getDate().size() > 1){
-            log_data = PCUtilTeamRepository.getTeamLogDataDate(req.getDepartment_name(), req.getDate().get(0), req.getDate().get(1));
-        }else{
-            log_data = PCUtilTeamRepository.getTeamLogData(req.getDepartment_name(), req.getDate().get(0));
-        }
-
+    public UserDataDto getPersonData(String department_name, List<String> date, String company_name) throws ParseException {
+       //List<TeamLogDataDto> log_data = new ArrayList<>();
         List<UserDetailDataDto> List_UserDetail = new ArrayList<UserDetailDataDto>();
-        TeamdataDto team = PCUtilTeamService.getTeamData(log_data, req.getDepartment_name());
-        List<TeaminfoDto> sameTeamMember = PCUtilTeamRepository.getSameTeamMemberByDepartment(req.getDepartment_name());
-        for (TeaminfoDto users : sameTeamMember) {
-            UserDetailDataDto person = getUserDetail(Math.toIntExact(users.getId()), users.getName(), req.getDate());
-            List_UserDetail.add(person);
+        Organization departments = PCUtilTeamRepository.getDepartments(department_name, company_name);
+        List<TeaminfoDto> data = PCUtilTeamRepository.getTeamData(departments.getId());
+        for (TeaminfoDto datum : data) {
+
+            List<TeaminfoDto> sameTeamMember = PCUtilTeamRepository.getSameTeamMemberByDepartment(datum.getName());
+            for (TeaminfoDto users : sameTeamMember) {
+                UserDetailDataDto person = getUserDetail(Math.toIntExact(users.getId()), users.getName(), date);
+                List_UserDetail.add(person);
+            }
         }
+        TeamdataDto.team_data team = new TeamdataDto.team_data();
         List<Double> total_time = new ArrayList<>();
         List<Double> work_time = new ArrayList<>();
         for (UserDetailDataDto userDetailDataDto : List_UserDetail) {
             total_time.add(userDetailDataDto.getTotal_time());
             work_time.add(userDetailDataDto.getWork_time());
-
         }
         double total_avg_data = total_time.stream()
                 .mapToDouble(a -> a)
@@ -50,8 +49,15 @@ public class PC_Util_UserService {
         double work_avg_data = work_time.stream()
                 .mapToDouble(a -> a)
                 .average().orElse(0);
+        team.setName(department_name);
+//        team.setPercent();
         team.setTotal_time(total_avg_data);
         team.setWork_time(work_avg_data);
+        if(total_avg_data == 0 || work_avg_data == 0){
+            team.setPercent(0);
+        }else {
+            team.setPercent(work_avg_data / total_avg_data * 100);
+        }
         return new UserDataDto(team, List_UserDetail);
     }
 
@@ -65,7 +71,21 @@ public class PC_Util_UserService {
         if(userLog.size() < 1){
             return new UserDetailDataDto(name, 0, 0, 0);
         }
-        return getUserData(userLog, name);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Map<String, List<TeamLogDataDto>> valid = userLog.stream().collect(Collectors.groupingBy(item -> dateFormat.format(item.getLog_time())));
+        UserDetailDataDto final_user_data = new UserDetailDataDto();
+        final_user_data.setUser_name(name);
+        long percent = 0;
+        for (String s : valid.keySet()) {
+            UserDetailDataDto userData = getUserData(valid.get(s), name);
+            final_user_data.setTotal_time(userData.getTotal_time() + final_user_data.getTotal_time());
+            percent += userData.getPercent();
+            final_user_data.setWork_time(userData.getWork_time() + final_user_data.getWork_time());
+        }
+        final_user_data.setTotal_time(final_user_data.getTotal_time() / valid.size());
+        final_user_data.setWork_time(final_user_data.getWork_time() / valid.size());
+        final_user_data.setPercent((double) percent / valid.size() *100 /100);
+        return final_user_data;
     }
 
     public UserDetailDataDto getUserData(List<TeamLogDataDto> log_data, String user_name) throws ParseException {

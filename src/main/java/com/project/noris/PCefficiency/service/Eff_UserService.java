@@ -4,7 +4,9 @@ package com.project.noris.PCefficiency.service;
 import com.project.noris.PCefficiency.dto.Eff_TeamDataDto;
 import com.project.noris.PCefficiency.dto.Eff_UserDataDto;
 import com.project.noris.PCutilization.dto.TeamLogDataDto;
+import com.project.noris.PCutilization.dto.TeaminfoDto;
 import com.project.noris.PCutilization.repository.PC_Util_TeamRepository;
+import com.project.noris.entity.Organization;
 import com.project.noris.lib.Service.S3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,32 +25,37 @@ public class Eff_UserService {
     private final S3Service s3Service;
     private final PC_Util_TeamRepository PCUtilTeamRepository;
 //    private final PCEfficiencyRepository pcEfficiencyRepository;
-    private final Eff_TeamService effDefaultService;
-    public  Eff_UserDataDto.final_data getEffData(String department_name, List<String> date) throws IOException, ParseException {
+    public  Eff_UserDataDto.final_data getEffData(String department_name, List<String> date, String company_name) throws IOException, ParseException {
         List<String> process_list = s3Service.readObject("process_list/process_list.csv");
         List<TeamLogDataDto> log_data = new ArrayList<>();
+        Organization departments = PCUtilTeamRepository.getDepartments(department_name, company_name);
+        List<TeaminfoDto> data = PCUtilTeamRepository.getTeamData(departments.getId());
         Eff_UserDataDto.final_data final_data = new Eff_UserDataDto.final_data();
-        if (date.size() > 1) {
-            log_data = PCUtilTeamRepository.getTeamLogDataDate(department_name, date.get(0), date.get(1));
-            final_data = getUserEffData(log_data, process_list, department_name);
-        } else {
-            log_data = PCUtilTeamRepository.getTeamLogData(department_name, date.get(0));
-            final_data = getUserEffData(log_data, process_list, department_name);
+        for (TeaminfoDto datum : data) {
+            if (date.size() > 1) {
+                log_data.addAll(PCUtilTeamRepository.getTeamLogDataDate(datum.getName(), date.get(0), date.get(1)));
+            } else {
+                log_data.addAll(PCUtilTeamRepository.getTeamLogData(datum.getName(), date.get(0)));
+            }
         }
-        // 수정해야함
-        //return effDefaultService.getTeamData(log_data);
+        final_data = getUserEffData(log_data, process_list, department_name);
         return final_data;
     }
-    public Eff_UserDataDto.Final_Usage_status_data getUsageStatus(String department_name, List<String> date){
+    public Eff_UserDataDto.Final_Usage_status_data getUsageStatus(String department_name, List<String> date, String company_name){
         List<TeamLogDataDto> log_data = new ArrayList<>();
         Eff_UserDataDto.Final_Usage_status_data final_data = new Eff_UserDataDto.Final_Usage_status_data();
-        if (date.size() > 1){
-            log_data = PCUtilTeamRepository.getTeamLogDataDate(department_name, date.get(0), date.get(1));
-            final_data = getUserUsageStatusData(log_data, department_name);
-        }else{
-            log_data = PCUtilTeamRepository.getTeamLogData(department_name, date.get(0));
-            final_data = getUserUsageStatusData(log_data, department_name);
+        Organization departments = PCUtilTeamRepository.getDepartments(department_name, company_name);
+        List<TeaminfoDto> data = PCUtilTeamRepository.getTeamData(departments.getId());
+        for (TeaminfoDto datum : data) {
+            if (date.size() > 1){
+                log_data.addAll(PCUtilTeamRepository.getTeamLogDataDate(datum.getName(), date.get(0), date.get(1)));
+
+            }else{
+                log_data.addAll(PCUtilTeamRepository.getTeamLogData(datum.getName(), date.get(0)));
+            }
         }
+        final_data = getUserUsageStatusData(log_data, department_name);
+
         return final_data;
     }
 
@@ -127,52 +134,62 @@ public class Eff_UserService {
     }
 
     public static Eff_UserDataDto.final_data getUserEffData(List<TeamLogDataDto> log_data, List<String> process_contain, String department_name) throws ParseException {
-        Map<Long, List<TeamLogDataDto>> valid = log_data.stream().collect(Collectors.groupingBy(TeamLogDataDto::getUser_id));
+        Map<Long, List<TeamLogDataDto>> user_per = log_data.stream().collect(Collectors.groupingBy(TeamLogDataDto::getUser_id));
         List<Float> teamData = new ArrayList<>();
         List<Eff_UserDataDto.User_data> users_data = new ArrayList<>();
         Eff_UserDataDto.final_data final_data = new Eff_UserDataDto.final_data();
         long total_time = 0;
         List<Double> userDataList = new ArrayList<>();
-        for (Long aLong : valid.keySet()) {
-            long none_work_log_time = 0;
-            long none_work_log_time_start = 0;
-            int count = 0;
-            boolean none_work_log_status = false;
-            String standard = "";
-            Date standard_start = new Date();
-            Long start_time = valid.get(aLong).get(0).getLog_time().getTime();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-            Long end_time = valid.get(aLong).get(valid.get(aLong).size() -1).getLog_time().getTime();
-            Long total_log_time = end_time - start_time;
-            long not_work_time = 0;
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            List<TeamLogDataDto> teamLogDataDtos = valid.get(aLong);
-            for(TeamLogDataDto data : teamLogDataDtos){
-                if(!process_contain.contains(data.getProcess_name())){
-                    none_work_log_time_start = data.getLog_time().getTime();
-                    none_work_log_status = true;
-                }
-                if(process_contain.contains(data.getProcess_name()) && none_work_log_status){
-                    none_work_log_time += (data.getLog_time().getTime() - none_work_log_time_start);
-                    none_work_log_status = false;
-                }
-
-                if(Objects.equals(data.getStatus(), "inactive")){
-                    String[] split = data.getAction().split(", ");
-                    Date date1 = formatter.parse(split[0]);
-                    Date date2 = formatter.parse(split[1]);
-                    not_work_time += (date2.getTime() - date1.getTime())/1000;
-                }
-            }
-            total_log_time /= 1000;
-            none_work_log_time = Math.abs(none_work_log_time) / 1000;
-            long work_time = total_log_time - (not_work_time);
-            double pc_efficient_percent = 100 -  ((double)none_work_log_time / (double)work_time)*100;
+        for (Long s : user_per.keySet()) {
+            Map<String, List<TeamLogDataDto>> valid = user_per.get(s).stream().collect(Collectors.groupingBy(item -> dateFormat.format(item.getLog_time())));
             Eff_UserDataDto.User_data user_data = new Eff_UserDataDto.User_data();
-            user_data.setUser_name(valid.get(aLong).get(0).getUser_name());
-            user_data.setEfficiency_time(Math.round((work_time - none_work_log_time) / 60));
-            user_data.setEfficiency_percent(Math.round(pc_efficient_percent*100)/100.0);
-            userDataList.add((Math.round(pc_efficient_percent*100)/100.0));
+            double user_percent = 0;
+            double user_eff_time = 0;
+            double pc_efficient_percent = 0;
+            for (String aLong : valid.keySet()) {
+                long none_work_log_time = 0;
+                long none_work_log_time_start = 0;
+                int count = 0;
+                boolean none_work_log_status = false;
+                String standard = "";
+                Date standard_start = new Date();
+                Long start_time = valid.get(aLong).get(0).getLog_time().getTime();
+                Long end_time = valid.get(aLong).get(valid.get(aLong).size() -1).getLog_time().getTime();
+                Long total_log_time = end_time - start_time;
+                long not_work_time = 0;
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                List<TeamLogDataDto> teamLogDataDtos = valid.get(aLong);
+                for(TeamLogDataDto data : teamLogDataDtos){
+                    if(!process_contain.contains(data.getProcess_name())){
+                        none_work_log_time_start = data.getLog_time().getTime();
+                        none_work_log_status = true;
+                    }
+                    if(process_contain.contains(data.getProcess_name()) && none_work_log_status){
+                        none_work_log_time += (data.getLog_time().getTime() - none_work_log_time_start);
+                        none_work_log_status = false;
+                    }
+
+                    if(Objects.equals(data.getStatus(), "inactive")){
+                        String[] split = data.getAction().split(", ");
+                        Date date1 = formatter.parse(split[0]);
+                        Date date2 = formatter.parse(split[1]);
+                        not_work_time += (date2.getTime() - date1.getTime())/1000;
+                    }
+                }
+                total_log_time /= 1000;
+                none_work_log_time = Math.abs(none_work_log_time) / 1000;
+                long work_time = total_log_time - (not_work_time);
+                pc_efficient_percent += 100 -  ((double)none_work_log_time / (double)work_time)*100;
+                user_eff_time += Math.round((work_time - none_work_log_time) / 60);
+                user_percent += Math.round((100 -  ((double)none_work_log_time / (double)work_time)*100)*100)/100.0;
+                user_data.setUser_name(valid.get(aLong).get(0).getUser_name());
+
+            }
+            userDataList.add((Math.round(pc_efficient_percent/ valid.size() *100)/100.0));
+            user_data.setEfficiency_time(user_eff_time / valid.size());
+            user_data.setEfficiency_percent(Math.round(user_percent / valid.size())*100/100.0);
             users_data.add(user_data);
         }
 
@@ -182,7 +199,7 @@ public class Eff_UserService {
                 .average().orElse(0);
         Eff_UserDataDto.Team_data team_data = new Eff_UserDataDto.Team_data();
         team_data.setDepartment_name(department_name);
-        team_data.setEfficiency_percent(avg_data);
+        team_data.setEfficiency_percent(Math.round(avg_data)*100/100.0);
 
         final_data.setTeam_data(team_data);
         final_data.setUsers_data(users_data);

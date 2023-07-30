@@ -43,7 +43,7 @@ public class PCUtilController {
         }
         JSONObject final_result = new JSONObject();
 //        List<OrganizationDto> result = defaultService.getOrganization(req.getCompany());
-        List<TeamdataDto> result2 = PCUtilTeamService.getTimeData(req.getUid(), req.getDate(), req.getDepartment_name(), req.getCompany_name());
+        List<TeamdataDto.team_data> result2 = PCUtilTeamService.getTimeData(req.getUid(), req.getDate(), req.getDepartment_name(), req.getCompany_name());
         final_result.put("TeamData", result2);
         return ResponseEntity.ok(final_result);
        //return response.success(defaultService.getOrganization(req.getCompany()));
@@ -55,7 +55,7 @@ public class PCUtilController {
         if(errors.hasErrors()) {
             return response.invalidFields(Helper.refineErrors(errors));
         }
-        UserDataDto result = pc_Util_userService.getPersonData(req);
+        UserDataDto result = pc_Util_userService.getPersonData(req.getDepartment_name(), req.getDate(), req.getCompany_name());
         return ResponseEntity.ok(result);
     }
 

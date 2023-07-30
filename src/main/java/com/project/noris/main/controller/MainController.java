@@ -72,8 +72,8 @@ public class MainController {
         for (String s : req.getDate()) {
             List<String> date = new ArrayList<>();
             date.add(s);
-            List<TeamdataDto> timeData = pcUtilTeamService.getTimeData(req.getUid(), date, req.getDepartment_name(), req.getCompany_name());
-            for (TeamdataDto timeDatum : timeData) {
+            List<TeamdataDto.team_data> timeData = pcUtilTeamService.getTimeData(req.getUid(), date, req.getDepartment_name(), req.getCompany_name());
+            for (TeamdataDto.team_data timeDatum : timeData) {
                 if (Objects.equals(timeDatum.getName(), req.getDepartment_name())){
                     team_usage.add(timeDatum.getPercent());
                 }

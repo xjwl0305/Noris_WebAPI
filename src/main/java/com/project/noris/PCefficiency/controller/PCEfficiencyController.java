@@ -57,7 +57,7 @@ public class PCEfficiencyController {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         JSONObject final_result = new JSONObject();
-        Eff_UserDataDto.final_data result = effSuperUserService.getEffData(req.getDepartment_name(), req.getDate());
+        Eff_UserDataDto.final_data result = effSuperUserService.getEffData(req.getDepartment_name(), req.getDate(), req.getCompany_name());
         return ResponseEntity.ok(result);
         //return response.success(defaultService.getOrganization(req.getCompany()));
     }
@@ -70,7 +70,7 @@ public class PCEfficiencyController {
             return response.invalidFields(Helper.refineErrors(errors));
         }
         JSONObject final_result = new JSONObject();
-        Eff_UserDataDto.Final_Usage_status_data result = effSuperUserService.getUsageStatus(req.getDepartment_name(), req.getDate());
+        Eff_UserDataDto.Final_Usage_status_data result = effSuperUserService.getUsageStatus(req.getDepartment_name(), req.getDate(), req.getCompany_name());
         return ResponseEntity.ok(result);
         //return response.success(defaultService.getOrganization(req.getCompany()));
     }

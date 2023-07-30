@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 public class UserDataDto {
-    TeamdataDto team;
+    TeamdataDto.team_data team;
     List<UserDetailDataDto> user;
 
 }
